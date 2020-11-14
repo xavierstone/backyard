@@ -1,13 +1,10 @@
-package com.example.campsitelocator;
+package com.xavierstone.backyard;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
 import android.os.Bundle;
-
-import java.util.List;
 
 // Could this be made to work with favorites too?
 // Use the Recycler view

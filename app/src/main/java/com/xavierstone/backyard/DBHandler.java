@@ -1,16 +1,11 @@
-package com.example.campsitelocator;
+package com.xavierstone.backyard;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
 
 /*
 The DBHandler class handles relations with the Database

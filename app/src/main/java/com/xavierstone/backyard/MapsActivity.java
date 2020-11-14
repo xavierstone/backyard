@@ -1,4 +1,4 @@
-package com.example.campsitelocator;
+package com.xavierstone.backyard;
 
 import androidx.fragment.app.FragmentActivity;
 
@@ -15,9 +15,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements GoogleMap.OnInfoWindowClickListener, OnMapReadyCallback {
 

@@ -1,4 +1,4 @@
-package com.example.campsitelocator;
+package com.xavierstone.backyard;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;

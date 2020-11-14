@@ -1,8 +1,4 @@
-package com.example.campsitelocator;
-
-import android.content.ContentValues;
-
-import java.util.List;
+package com.xavierstone.backyard;
 
 /*
 This class holds information about a Table in the database

@@ -1,21 +1,11 @@
-package com.example.campsitelocator;
+package com.xavierstone.backyard;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.media.Rating;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.RatingBar;
-import android.widget.TextView;
-
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 
 import java.util.ArrayList;
 
