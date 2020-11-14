@@ -53,20 +53,28 @@
         app:layout_constraintStart_toStartOf="parent">
         <!--style="?android:attr/buttonBarStyle"-->
 
-        <Button style="@style/MainNavButton"
+        <Button
             android:id="@+id/favesButton"
+            style="@style/MainNavButton"
+            android:drawableTop="@android:drawable/btn_star"
             android:text="@string/favesButtonText" />
 
-        <Button style="@style/MainNavButton"
+        <Button
             android:id="@+id/addButton"
+            style="@style/MainNavButton"
+            android:drawableTop="@android:drawable/ic_menu_add"
             android:text="@string/addButtonText" />
 
-        <Button style="@style/MainNavButton"
+        <Button
             android:id="@+id/signButton"
+            style="@style/MainNavButton"
+            android:drawableTop="@android:drawable/ic_lock_idle_lock"
             android:text="@string/signButtonText" />
 
-        <Button style="@style/MainNavButton"
+        <Button
             android:id="@+id/helpButton"
+            style="@style/MainNavButton"
+            android:drawableTop="@android:drawable/ic_menu_help"
             android:onClick="goToSearchOptions"
             android:text="@string/helpButtonText" />
     </LinearLayout>
