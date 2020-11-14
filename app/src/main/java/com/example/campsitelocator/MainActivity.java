@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        boolean GOD_MODE = false;
+        boolean GOD_MODE = true;
 
         // God Mode
         if (GOD_MODE) {
@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                 userID = Integer.parseInt(user.get(0).getData("id"));
             }
 
-            Intent intent = new Intent(MainActivity.this, SearchOptionsActivity.class);
+            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
             startActivity(intent);
         }
 
