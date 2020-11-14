@@ -1,39 +1,32 @@
 package com.xavierstone.backyard;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
-import android.Manifest;
 import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.widget.SearchView;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.RatingBar;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
 
 /*
-Provides the user with a convenient home screen
+Provides the user with a multi-activity home screen
+Integrates map functionality with main navigation and search bar
  */
 
 public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWindowClickListener, OnMapReadyCallback, GoogleMap.OnMapClickListener {
@@ -134,6 +127,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
 
             // Update LatLng Bounds
             if (latLngs.size() > 1){
+                assert bounds != null;
                 bounds.include(latLngs.get(i));
             }else{
                 bounds = new LatLngBounds.Builder().include(latLngs.get(0));
@@ -154,6 +148,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
 
         int zoom = (int) (14 - Math.floor(Math.log10(spread/500)/Math.log10(2)));
 
+        assert bounds != null;
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bounds.build().getCenter(), zoom));
         googleMap.setOnInfoWindowClickListener(this);
 
