@@ -32,7 +32,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        ratingBar = findViewById(R.id.ratingBarHome);
+        //ratingBar = findViewById(R.id.ratingBarHome);
     }
 
     // Goes to Favorites Activity
