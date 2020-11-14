@@ -8,10 +8,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <fragment
+        android:id="@+id/googleMapsFrag"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/searchBar"
+        app:layout_constraintVertical_bias="0.0" />
+
     <SearchView
         android:id="@+id/searchBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:alpha=".9"
+        android:background="#F4D1B6"
+        android:elevation="20dp"
         android:iconifiedByDefault="false"
         android:queryHint="@string/searchQueryHint"
         app:layout_constraintEnd_toEndOf="parent"
@@ -23,75 +39,36 @@
 
     </SearchView>
 
-    <fragment
-        android:id="@+id/googleMapsFrag"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        app:layout_constraintBottom_toTopOf="@+id/mainNavButtons"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchBar" />
-
     <LinearLayout
         android:id="@+id/mainNavButtons"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:alpha=".8"
+        android:background="@color/colorAccent"
+        android:elevation="20dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        style="?android:attr/buttonBarButtonStyle">
+        app:layout_constraintStart_toStartOf="parent">
+        <!--style="?android:attr/buttonBarStyle"-->
 
-        <Button
+        <Button style="@style/MainNavButton"
             android:id="@+id/favesButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:fontFamily="sans-serif-black"
-            android:text="@string/favesButtonText"
-            android:textAllCaps="false"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            tools:layout_conversion_absoluteHeight="48dp"
-            tools:layout_conversion_absoluteWidth="88dp" />
+            android:text="@string/favesButtonText" />
 
-        <Button
+        <Button style="@style/MainNavButton"
             android:id="@+id/addButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:fontFamily="sans-serif-black"
-            android:text="@string/addButtonText"
-            android:textAllCaps="false"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            tools:layout_conversion_absoluteHeight="48dp"
-            tools:layout_conversion_absoluteWidth="88dp" />
+            android:text="@string/addButtonText" />
 
-        <Button
+        <Button style="@style/MainNavButton"
             android:id="@+id/signButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:fontFamily="sans-serif-black"
-            android:text="@string/signButtonText"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            tools:layout_conversion_absoluteHeight="48dp"
-            tools:layout_conversion_absoluteWidth="88dp" />
+            android:text="@string/signButtonText" />
 
-        <Button
+        <Button style="@style/MainNavButton"
             android:id="@+id/helpButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:fontFamily="sans-serif-black"
             android:onClick="goToSearchOptions"
-            android:text="@string/helpButtonText"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            tools:ignore="ButtonStyle"
-            tools:layout_conversion_absoluteHeight="48dp"
-            tools:layout_conversion_absoluteWidth="88dp" />
+            android:text="@string/helpButtonText" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
