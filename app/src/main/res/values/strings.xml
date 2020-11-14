@@ -21,4 +21,9 @@
     <string name="facebook_app_id">265318024465984</string>
     <string name="fb_login_protocol_scheme">fb265318024465984</string>
     <string name="share">Share</string>
+    <string name="searchQueryHint">Search here</string>
+    <string name="favesButtonText">Faves</string>
+    <string name="addButtonText">Add</string>
+    <string name="signButtonText">Sign In</string>
+    <string name="helpButtonText">Help</string>
 </resources>

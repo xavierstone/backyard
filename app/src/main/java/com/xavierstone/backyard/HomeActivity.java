@@ -1,16 +1,21 @@
 package com.xavierstone.backyard;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.widget.SearchView;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.RatingBar;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -22,6 +27,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
 
@@ -29,10 +36,15 @@ import java.util.ArrayList;
 Provides the user with a convenient home screen
  */
 
-public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWindowClickListener, OnMapReadyCallback {
+public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWindowClickListener, OnMapReadyCallback, GoogleMap.OnMapClickListener {
 
     // Marker list
     private ArrayList<Marker> markers = new ArrayList<>();
+
+    // Search results array, can be referenced from MapsActivity
+    public static ArrayList<DBData> searchResults = new ArrayList<>();
+
+    private GoogleMap googleMap;
 
     RatingBar ratingBar;
 
@@ -41,25 +53,63 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        /* Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        // Initialize Search Bar
+        final SearchView searchView = findViewById(R.id.searchBar);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            // Activates when user clicks on search buttons
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // Search for query
+                updateSearchResults(query);
+
+                // For non-empty result lists, update map
+                if (!searchResults.isEmpty()) {
+                    displayMapResults();
+                }
+
+                // Clear query
+                searchView.setQuery("", false);
+
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+        // Load the Google Map Fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.googleMapsFrag);
         assert mapFragment != null;
-        mapFragment.getMapAsync(this);*/
-
-        MapFragment mMapFragment = MapFragment.newInstance();
-        FragmentTransaction fragmentTransaction =
-                getFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.googleMapsFrag, mMapFragment);
-        fragmentTransaction.commit();
+        mapFragment.getMapAsync(this);
 
         //ratingBar = findViewById(R.id.ratingBarHome);
     }
 
-    // Google Maps Stuff
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        /*
+    // Compartmentalizes the query process
+    private void updateSearchResults(String term) {
+        // Clear search results
+        searchResults.clear();
+
+        // Construct where clause
+        String whereClause = "";
+
+        // Form query
+        if (!term.isEmpty()) {
+            // If name is provided, start clause
+            whereClause = "(name LIKE \"%" + term + "%\" OR " +
+                    "description LIKE \"%" + term + "%\")";
+        }
+
+        // Pass query to search method
+        DBHandler dbHandler = new DBHandler(this, null, null, 1);
+        searchResults = dbHandler.search(DBHandler.campsitesTable, whereClause);
+    }
+
+    private void displayMapResults(){
         ArrayList<LatLng> latLngs = new ArrayList<>();
         LatLngBounds.Builder bounds = null;
 
@@ -69,9 +119,9 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         double spread = 0;
 
         // Loop through results list and add a marker for each site
-        for (int i=0; i<SearchOptionsActivity.searchResults.size(); i++){
+        for (int i=0; i<searchResults.size(); i++){
 
-            curData = SearchOptionsActivity.searchResults.get(i);
+            curData = searchResults.get(i);
             curLat = Double.parseDouble(curData.getData("lat"));
             curLng = Double.parseDouble(curData.getData("long"));
 
@@ -113,7 +163,19 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
 
             googleMap.setMyLocationEnabled(true);
         }
-        */
+
+        // Hide that pesky keyboard
+        hideKeyboard();
+    }
+
+    // Google Maps Stuff
+    @Override
+    public void onMapReady(GoogleMap newMap) {
+        // Set global map to newly ready map
+        googleMap = newMap;
+
+        // Enable map click listener
+        googleMap.setOnMapClickListener(this);
 
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
@@ -121,6 +183,24 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
                 .position(sydney)
                 .title("Marker in Sydney"));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+        hideKeyboard();
+    }
+
+    private void hideKeyboard(){
+        // Hide the on-screen keyboard
+        InputMethodManager imm = (InputMethodManager) this.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = this.getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(this);
+        }
+        assert imm != null;
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     @Override
