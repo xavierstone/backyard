@@ -1,6 +1,7 @@
 package com.xavierstone.backyard;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
@@ -42,6 +43,8 @@ public class SearchOptionsActivity extends AppCompatActivity {
     public static double longitude = 0;
     public static double latitude = 0;
 
+    boolean permission;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,33 +57,33 @@ public class SearchOptionsActivity extends AppCompatActivity {
         searchStatus = findViewById(R.id.searchStatus);
         mapSearch = findViewById(R.id.mapSearch);
 
-        boolean permission = (ContextCompat.checkSelfPermission( this,
-                Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED ) &&
+        permission = (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) /*&&
                 (ContextCompat.checkSelfPermission( this,
-                        Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED );
+                        Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED)*/;
 
         if (!permission) {
             mapSearch.setVisibility(View.GONE);
             searchRadius.setVisibility(View.GONE);
             radiusLabel.setVisibility(View.GONE);
-        }else {
+        } else {
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         }
     }
 
     // Searches for campsites based on provided data, returns results in a list
-    public void searchCampsites(View view){
+    public void searchCampsites(View view) {
         updateSearchResults();
 
-        if (searchResults.isEmpty()){
+        if (searchResults.isEmpty()) {
             // No results
             searchStatus.setText("No results found");
-        }else if (searchResults.size() == 1){
+        } else if (searchResults.size() == 1) {
             // One result, go straight to page
             DisplayCampsiteActivity.currentCampsite = Long.parseLong(searchResults.get(0).getData("id"));
             Intent intent = new Intent(SearchOptionsActivity.this, DisplayCampsiteActivity.class);
             startActivity(intent);
-        }else{
+        } else {
             // Pass to list results activity
             Intent intent = new Intent(SearchOptionsActivity.this, ListResultsActivity.class);
             startActivity(intent);
@@ -88,13 +91,13 @@ public class SearchOptionsActivity extends AppCompatActivity {
     }
 
     // Searches for campsites and displays a map
-    public void mapSearch(View view){
+    public void mapSearch(View view) {
         updateSearchResults();
 
         if (searchResults.isEmpty()) {
             // No results
             searchStatus.setText("No results found");
-        }else{
+        } else {
             // Pass control to MapResults
             Intent intent = new Intent(SearchOptionsActivity.this, MapsActivity.class);
             startActivity(intent);
@@ -102,7 +105,7 @@ public class SearchOptionsActivity extends AppCompatActivity {
     }
 
     // Compartmentalizes the query process
-    private void updateSearchResults(){
+    private void updateSearchResults() {
         // Construct where clause
         String whereClause = "";
         String term = searchName.getText().toString();
@@ -111,16 +114,26 @@ public class SearchOptionsActivity extends AppCompatActivity {
 
         setRadius = false;
 
-        if (!term.isEmpty()){
+        if (!term.isEmpty()) {
             // If name is provided, start clause
-            whereClause = "(name LIKE \"%" + term + "%\" OR "+
+            whereClause = "(name LIKE \"%" + term + "%\" OR " +
                     "description LIKE \"%" + term + "%\")";
             numTerms++;
         }
-        if (!radiusText.isEmpty()){
+        if (!radiusText.isEmpty()) {
             // If radius is provided, get current location
             double radius = Double.parseDouble(radiusText);
-            if (fusedLocationClient!=null){
+            if (fusedLocationClient != null && permission) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
                 Task locationTask = fusedLocationClient.getLastLocation()
                         .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                             @Override

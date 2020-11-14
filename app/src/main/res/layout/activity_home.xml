@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -19,6 +20,17 @@
         tools:layout_conversion_absoluteWidth="407dp">
 
     </SearchView>
+
+    <fragment
+        android:id="@+id/googleMapsFrag"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        app:layout_constraintBottom_toTopOf="@+id/mainNavButtons"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/searchBar" />
 
     <LinearLayout
         android:id="@+id/mainNavButtons"
@@ -71,8 +83,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="sans-serif-black"
+            android:onClick="goToSearchOptions"
             android:text="Help"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            tools:ignore="ButtonStyle"
             tools:layout_conversion_absoluteHeight="48dp"
             tools:layout_conversion_absoluteWidth="88dp" />
     </LinearLayout>

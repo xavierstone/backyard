@@ -1,8 +1,11 @@
 package com.xavierstone.backyard;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -83,7 +86,13 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnInfoWi
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bounds.build().getCenter(), zoom));
         mMap.setOnInfoWindowClickListener(this);
-        mMap.setMyLocationEnabled(true);
+
+        // Check for location permission before enabling myLocation
+        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION )
+                == PackageManager.PERMISSION_GRANTED ) {
+
+            mMap.setMyLocationEnabled(true);
+        }
     }
 
     @Override

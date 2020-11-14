@@ -129,9 +129,7 @@ public class MainActivity extends AppCompatActivity {
 
             ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_FINE_LOCATION  },
                     PERMISSION_ACCESS_FINE_LOCATION );
-        }
-
-         */
+        }*/
 
         // Check for facebook login
         final AccessToken accessToken = AccessToken.getCurrentAccessToken();
