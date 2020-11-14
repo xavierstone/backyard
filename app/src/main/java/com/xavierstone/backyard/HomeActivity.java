@@ -176,13 +176,6 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
 
         // Enable map click listener
         googleMap.setOnMapClickListener(this);
-
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        googleMap.addMarker(new MarkerOptions()
-                .position(sydney)
-                .title("Marker in Sydney"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     @Override
@@ -209,7 +202,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
             if (markers.get(i).equals(marker)) {
                 Intent intent = new Intent(HomeActivity.this, DisplayCampsiteActivity.class);
                 DisplayCampsiteActivity.currentCampsite =
-                        Long.parseLong(SearchOptionsActivity.searchResults.get(i).getData("id"));
+                        Long.parseLong(searchResults.get(i).getData("id"));
                 startActivity(intent);
             }
         }
