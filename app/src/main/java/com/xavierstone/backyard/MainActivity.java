@@ -1,14 +1,20 @@
 package com.xavierstone.backyard;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.facebook.AccessToken;
@@ -32,28 +38,43 @@ public class MainActivity extends AppCompatActivity {
 
     // Static variable to track logged in user
     public static int userID = 0;
-    public static int PERMISSION_ACCESS_COARSE_LOCATION=1;
-    public static int PERMISSION_ACCESS_FINE_LOCATION=2;
-    public static int PERMISSION_READ_EXTERNAL_STORAGE=3;
+    public static int LOCATION_REQUEST=0;
+    public static int STORAGE_REQUEST=1;
     private static final String EMAIL = "email";
+
+    private final String locationRequest[] = new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION,
+            android.Manifest.permission.ACCESS_FINE_LOCATION};
+    private final String storageRequest[] = new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE};
 
     // Text fields
     TextView loginFeedbackView;
     EditText emailAddressBox;
     EditText passwordBox;
 
+    ProgressBar progressBar;
+
     private CallbackManager callbackManager = CallbackManager.Factory.create();
 
     public static boolean dontLogIn = false;
 
+    final DBHandler dbHandler = new DBHandler(this, null, null,1);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_2);
+
+        progressBar = findViewById(R.id.progressBar);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Check for permissions
+        checkPermissions();
 
         // Hardcode database values
         // Gorge Site
-        final DBHandler dbHandler = new DBHandler(this, null, null,1);
         String text = "";
 
         // Open file
@@ -67,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
         }catch (IOException ex){
             ex.printStackTrace();
         }
+        progressBar.setProgress(10);
 
         String c = "";
         String subStr = "";
@@ -80,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Parse file
         for (int i=0; i < text.length(); i++){
+            progressBar.setProgress(10 + ((int) 90*(i/text.length())));
             c = text.substring(i, i+1);
 
             if ((!skip) && (c.equals("|") || c.equals("`"))){
@@ -114,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        /*
         // Request permissions
         // Coarse location
         if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION )
@@ -131,73 +155,41 @@ public class MainActivity extends AppCompatActivity {
                     PERMISSION_ACCESS_FINE_LOCATION );
         }*/
 
-        // Check for facebook login
-        final AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
-
-        if (isLoggedIn && !dontLogIn){
-            String token = accessToken.getUserId();
-            MainActivity.userID = Integer.parseInt(dbHandler.search(DBHandler.usersTable, "email", token)
-                    .get(0).getData("id"));
-            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-            startActivity(intent);
-        }
-
-
-        boolean GOD_MODE = true;
-
-        // God Mode
-        if (GOD_MODE) {
-            ArrayList<DBData> user = dbHandler.search(DBHandler.usersTable,
-                    "email", "xaviermstone@gmail.com");
-
-            if (user.isEmpty()) {
-                DBData xavier = new DBData(DBHandler.usersTable);
-                xavier.addData(new String[]{"0", "Xavier", "Stone", ""+DBHandler.LOCAL_ACCOUNT, "xaviermstone@gmail.com"});
-                userID = (int) dbHandler.insert(xavier);
-                InternalStorage.saveCredentials(this, "xaviermstone@gmail.com,Qwakmagic45\n");
-            } else {
-                userID = Integer.parseInt(user.get(0).getData("id"));
-            }
-
-            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-            startActivity(intent);
-        }
-
         // Load fields
-        loginFeedbackView = (TextView) findViewById(R.id.loginFeedback);
-        emailAddressBox = (EditText) findViewById(R.id.loginEmail);
-        passwordBox = (EditText) findViewById(R.id.loginPassword);
+        //loginFeedbackView = (TextView) findViewById(R.id.loginFeedback);
+        //emailAddressBox = (EditText) findViewById(R.id.loginEmail);
+        //passwordBox = (EditText) findViewById(R.id.loginPassword);
 
-        LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
+        //LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
         //loginButton.setReadPermissions(Arrays.asList(EMAIL));
         // If you are using in a fragment, call loginButton.setFragment(this);
-
-        // Callback registration
-        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                // App code
-                DBData newUser = new DBData(DBHandler.usersTable);
-                final AccessToken accessToken2 = AccessToken.getCurrentAccessToken();
-                newUser.addData(new String[]{"0","Facebook","Account",""+DBHandler.FACEBOOK_ACCOUNT, accessToken2.getUserId()});
-                userID = (int) dbHandler.insert(newUser);
-                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-                startActivity(intent);
-            }
-
-            @Override
-            public void onCancel() {
-                // App code
-            }
-
-            @Override
-            public void onError(FacebookException exception) {
-                // App code
-            }
-        });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        checkPermissions();
+    }
+
+    private void checkPermissions(){
+        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+
+            // Location granted
+            if ( ContextCompat.checkSelfPermission( this, Manifest.permission.READ_EXTERNAL_STORAGE ) == PackageManager.PERMISSION_GRANTED){
+
+                // External storage granted
+                goToHome();
+            }else{
+                ActivityCompat.requestPermissions(this, storageRequest, STORAGE_REQUEST);
+            }
+
+        }else{
+
+            ActivityCompat.requestPermissions(this, locationRequest, LOCATION_REQUEST);
+        }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -207,13 +199,37 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
-        // Read external storage
-        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.READ_EXTERNAL_STORAGE )
-                != PackageManager.PERMISSION_GRANTED ) {
-
-            ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.READ_EXTERNAL_STORAGE  },
-                    PERMISSION_READ_EXTERNAL_STORAGE );
+        if (grantResults[LOCATION_REQUEST] == PackageManager.PERMISSION_GRANTED) {
+            // Location enabled
+            if (grantResults[STORAGE_REQUEST] == PackageManager.PERMISSION_GRANTED) {
+                // Storage enabled too
+                goToHome();
+            }else{
+                // Request storage
+                ActivityCompat.requestPermissions(this, storageRequest, STORAGE_REQUEST);
+            }
+        }else{
+            // Request location
+            ActivityCompat.requestPermissions(this, locationRequest, LOCATION_REQUEST);
         }
+    }
+
+    private void goToHome(){
+        // God mode is hardcoded
+        ArrayList<DBData> user = dbHandler.search(DBHandler.usersTable,
+                    "email", "xaviermstone@gmail.com");
+
+        if (user.isEmpty()) {
+            DBData xavier = new DBData(DBHandler.usersTable);
+            xavier.addData(new String[]{"0", "Xavier", "Stone", ""+DBHandler.LOCAL_ACCOUNT, "xaviermstone@gmail.com"});
+            userID = (int) dbHandler.insert(xavier);
+            InternalStorage.saveCredentials(this, "xaviermstone@gmail.com,Qwakmagic45\n");
+        } else {
+            userID = Integer.parseInt(user.get(0).getData("id"));
+        }
+
+        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+        startActivity(intent);
     }
 
     // Verifies the user's credentials and signs them in
