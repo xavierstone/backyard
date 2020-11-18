@@ -34,9 +34,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     implementation 'com.google.android.gms:play-services-location:17.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation "androidx.recyclerview:recyclerview:${recyclerviewVersion}"
-    implementation 'com.facebook.android:facebook-share:5.15.3'
-    implementation 'com.facebook.android:facebook-login:5.15.3'\
+    implementation "androidx.recyclerview:recyclerview:${recyclerviewVersion}"\
 
 
 }

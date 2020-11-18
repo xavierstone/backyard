@@ -1,2 +1,2 @@
 rootProject.name='BackYard'
-include ':app', ':facebook-login'
+include ':app'
