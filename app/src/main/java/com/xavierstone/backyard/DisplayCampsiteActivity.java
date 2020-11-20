@@ -15,10 +15,6 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.facebook.share.model.SharePhoto;
-import com.facebook.share.model.SharePhotoContent;
-import com.facebook.share.widget.ShareButton;
-
 import java.util.ArrayList;
 
 /*
@@ -35,7 +31,6 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
     ImageButton galleryBackButton;
     ImageButton galleryForwardButton;
     Button uploadButton;
-    ShareButton shareButton;
     RatingBar ratingBar;
     RatingBar userRating;
     ImageButton favButton;
@@ -59,7 +54,6 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         galleryForwardButton = findViewById(R.id.galleryForwardButton);
         uploadButton = findViewById(R.id.uploadButton);
         displayCampsiteStatus = findViewById(R.id.displayCampsiteStatus);
-        shareButton = (ShareButton)findViewById(R.id.share_btn);
         ratingBar = findViewById(R.id.rating);
         userRating = findViewById(R.id.userRating);
         favButton = findViewById(R.id.favButton);
@@ -117,15 +111,6 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
 
     // Updates the ImageView based on the current photo
     private void updatePhoto(){
-        Bitmap image = getCurrentBitmap();
-        SharePhoto photo = new SharePhoto.Builder()
-                .setBitmap(image)
-                .build();
-        SharePhotoContent content = new SharePhotoContent.Builder()
-                .addPhoto(photo)
-                .build();
-        campsitePhoto.setImageBitmap(image);
-        shareButton.setShareContent(content);
     }
 
     private void updateRatings(){

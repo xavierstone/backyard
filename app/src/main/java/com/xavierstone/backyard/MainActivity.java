@@ -1,78 +1,70 @@
 package com.xavierstone.backyard;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-
 /*
-Page the app opens to, requests credentials or gives the user the option to create a new account
+Page the app opens to, asks permissions
  */
 
 public class MainActivity extends AppCompatActivity {
 
-    // Static variable to track logged in user
+    // userID is required by many other classes for now
     public static int userID = 0;
+
+    // Permission managment
     public static int LOCATION_REQUEST=0;
     public static int STORAGE_REQUEST=1;
-    private static final String EMAIL = "email";
 
     private final String locationRequest[] = new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION,
             android.Manifest.permission.ACCESS_FINE_LOCATION};
     private final String storageRequest[] = new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE};
 
-    // Text fields
-    TextView loginFeedbackView;
-    EditText emailAddressBox;
-    EditText passwordBox;
+    boolean allowedPermissions[];
 
-    ProgressBar progressBar;
+    //private CallbackManager callbackManager = CallbackManager.Factory.create();
 
-    private CallbackManager callbackManager = CallbackManager.Factory.create();
-
-    public static boolean dontLogIn = false;
-
-    final DBHandler dbHandler = new DBHandler(this, null, null,1);
+    //final DBHandler dbHandler = new DBHandler(this, null, null,1);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_2);
-
-        progressBar = findViewById(R.id.progressBar);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        // Check for permissions
-        checkPermissions();
 
+        // Check for permissions, global variable used in onRequestPermissionsResult
+        allowedPermissions = checkPermissions();
+
+        // Determine Initial Permission to request
+        // Request is processed in onRequestPermissionsResult,
+        // then second permission is requested if applicable
+
+        // If location permission
+        if (allowedPermissions[LOCATION_REQUEST] == true) {
+            // If storage permission too
+            if (allowedPermissions[STORAGE_REQUEST] == true) {
+                // Go to home
+                goToHome();
+            }else {
+                // Otherwise, request storage permission
+                ActivityCompat.requestPermissions(this, storageRequest, STORAGE_REQUEST);
+            }
+        }else {
+            // Otherwise, request location permission
+            ActivityCompat.requestPermissions(this, locationRequest, LOCATION_REQUEST);
+        }
+
+        /*
         // Hardcode database values
         // Gorge Site
         String text = "";
@@ -88,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
         }catch (IOException ex){
             ex.printStackTrace();
         }
-        progressBar.setProgress(10);
 
         String c = "";
         String subStr = "";
@@ -102,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Parse file
         for (int i=0; i < text.length(); i++){
-            progressBar.setProgress(10 + ((int) 90*(i/text.length())));
             c = text.substring(i, i+1);
 
             if ((!skip) && (c.equals("|") || c.equals("`"))){
@@ -165,58 +155,48 @@ public class MainActivity extends AppCompatActivity {
         // If you are using in a fragment, call loginButton.setFragment(this);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+    private boolean[] checkPermissions(){
+        // Initialize results
+        boolean results[] = { false, false };
 
-        checkPermissions();
-    }
-
-    private void checkPermissions(){
+        // Check location
         if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-
+                && ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             // Location granted
-            if ( ContextCompat.checkSelfPermission( this, Manifest.permission.READ_EXTERNAL_STORAGE ) == PackageManager.PERMISSION_GRANTED){
-
-                // External storage granted
-                goToHome();
-            }else{
-                ActivityCompat.requestPermissions(this, storageRequest, STORAGE_REQUEST);
-            }
-
-        }else{
-
-            ActivityCompat.requestPermissions(this, locationRequest, LOCATION_REQUEST);
+            results[LOCATION_REQUEST] = true;
         }
+
+        // Check storage
+        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.READ_EXTERNAL_STORAGE ) == PackageManager.PERMISSION_GRANTED){
+            // Storage granted
+            results[STORAGE_REQUEST] = true;
+        }
+
+        return results;
     }
 
-    @Override
+    /*@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         callbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
-    }
+    }*/
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
-        if (grantResults[LOCATION_REQUEST] == PackageManager.PERMISSION_GRANTED) {
-            // Location enabled
-            if (grantResults[STORAGE_REQUEST] == PackageManager.PERMISSION_GRANTED) {
-                // Storage enabled too
-                goToHome();
-            }else{
-                // Request storage
-                ActivityCompat.requestPermissions(this, storageRequest, STORAGE_REQUEST);
-            }
+        // Don't check results, users are allowed to deny the permissions
+        // Just check to see if storage is allowed or asked, if not, ask
+        if (allowedPermissions[STORAGE_REQUEST] == true || requestCode == STORAGE_REQUEST){
+            // Storage approved too, go to home
+            goToHome();
         }else{
-            // Request location
-            ActivityCompat.requestPermissions(this, locationRequest, LOCATION_REQUEST);
+            // Request storage
+            ActivityCompat.requestPermissions(this, storageRequest, STORAGE_REQUEST);
         }
     }
 
-    private void goToHome(){
+    public void goToHome() {
         // God mode is hardcoded
-        ArrayList<DBData> user = dbHandler.search(DBHandler.usersTable,
+        /*ArrayList<DBData> user = dbHandler.search(DBHandler.usersTable,
                     "email", "xaviermstone@gmail.com");
 
         if (user.isEmpty()) {
@@ -226,12 +206,14 @@ public class MainActivity extends AppCompatActivity {
             InternalStorage.saveCredentials(this, "xaviermstone@gmail.com,Qwakmagic45\n");
         } else {
             userID = Integer.parseInt(user.get(0).getData("id"));
-        }
+        }*/
 
+        // Transfer control to Home Activity
         Intent intent = new Intent(MainActivity.this, HomeActivity.class);
         startActivity(intent);
     }
 
+    /*
     // Verifies the user's credentials and signs them in
     public void signIn(View view) throws NoSuchAlgorithmException, InvalidKeySpecException {
         // Read from boxes
@@ -280,5 +262,5 @@ public class MainActivity extends AppCompatActivity {
         // Start Create Account activity
         Intent intent = new Intent(MainActivity.this, CreateAccountActivity.class);
         startActivity(intent);
-    }
+    }*/
 }

@@ -203,6 +203,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         }
     }
 
+    /*
     // Goes to Favorites Activity
     public void goToFavorites(View view){
         // Search for favorites
@@ -267,5 +268,5 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         MainActivity.userID = 0;
         Intent intent = new Intent(HomeActivity.this, MainActivity.class);
         startActivity(intent);
-    }
+    }*/
 }
