@@ -24,16 +24,13 @@ public class Rant {
     public byte getStars() { return stars; }
     public String getWords() { return words; }
 
-    // Setters (with permissions)
-    public void setStars(User author, byte stars) {
-        if (this.author == author)
-            this.stars = stars;
-    }
+    // Permission check
+    public boolean hasPermission(User author) { return (this.author == author); }
 
-    public void setWords(User author, String words) {
-        if (this.author == author)
-            this.words = words;
-    }
+    // Setters (with permissions)
+    public void setStars(User author, byte stars) { if (hasPermission(author)) this.stars = stars; }
+
+    public void setWords(User author, String words) { if (hasPermission(author)) this.words = words; }
 
     // Delete site
     // TODO: implement delete site

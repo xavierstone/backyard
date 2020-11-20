@@ -39,25 +39,25 @@ public class Site {
 
     // Get star rating
     public float getStars() {
-        // TODO: implement star rating
-        return 0.0f;
+        // initialize rating sum
+        float totalRating = 0.0f;
+
+        // Loop through ArrayList and add values
+        for (Rant rant : rants) {
+            totalRating += rant.getStars();
+        }
+
+        // Divide by total number of reviews and return
+        return totalRating/rants.size();
     }
 
-    // Setters
-    public void setName(User author, String name) {
-        if (this.author == author)
-            this.name = name;
-    }
+    // Check permissions
+    public boolean hasPermission(User author) { return (this.author == author); }
 
-    public void setLocation(User author, LatLng location) {
-        if (this.author == author)
-            this.location = location;
-    }
-
-    public void setSkinny(User author, String skinny) {
-        if (this.author == author)
-            this.skinny = skinny;
-    }
+    // Setters, check permission first
+    public void setName(User author, String name) { if (hasPermission(author)) this.name = name; }
+    public void setLocation(User author, LatLng location) { if (hasPermission(author)) this.location = location; }
+    public void setSkinny(User author, String skinny) { if (hasPermission(author)) this.skinny = skinny; }
 
     // Registers
     public void registerPhoto(Photo photo) { photos.add(photo); }
