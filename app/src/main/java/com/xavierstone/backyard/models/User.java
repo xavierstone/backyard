@@ -43,6 +43,7 @@ public class User {
     public void setName(String name) { this.name = name; }
     public void setEmail(String email) { this.email = email; }
     public void setPassword(String password) { this.password = password; }
+    public void setCurrentSite(Site site) { this.currentSite = site; }
 
     // Add favorite site
     public void addFave(Site site) { faves.add(site); }
@@ -51,6 +52,7 @@ public class User {
     public String getName() { return name; }
     public String getEmail() { return email; }
     public String getPassword() { return password; }
+    public Site getCurrentSite() { return currentSite; }
 
     // Version 0.1 array list getters
     public ArrayList<Site> getFaves() { return faves; }
