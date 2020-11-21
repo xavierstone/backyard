@@ -1,4 +1,4 @@
-package com.xavierstone.backyard;
+package com.xavierstone.backyard.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.xavierstone.backyard.R;
 
 /*
 Lists favorite campsites for the current user
@@ -26,7 +26,8 @@ public class FavoritesActivity extends AppCompatActivity {
         // Load results view
         favoriteResultsView = findViewById(R.id.favoriteResults);
 
-        // Search for favorites
+        /*
+        // TODO: Search for favorites
         DBHandler dbHandler = new DBHandler(this, null, null,1);
         ArrayList<DBData> resultsList = dbHandler.search(DBHandler.favoritesTable,
                 "user_id", ""+MainActivity.userID);
@@ -48,7 +49,7 @@ public class FavoritesActivity extends AppCompatActivity {
             resultString = "No results.";
         }
 
-        favoriteResultsView.setText(resultString);
+        favoriteResultsView.setText(resultString);*/
     }
 
     // Goes to home screen

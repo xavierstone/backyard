@@ -1,4 +1,4 @@
-package com.xavierstone.backyard;
+package com.xavierstone.backyard.models;
 
 // User added review of a campsite
 public class Rant {

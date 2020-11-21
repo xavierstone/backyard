@@ -1,9 +1,12 @@
-package com.xavierstone.backyard;
+package com.xavierstone.backyard.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.widget.TextView;
+
+import com.xavierstone.backyard.R;
+import com.xavierstone.backyard.db.DBData;
 
 import java.util.ArrayList;
 

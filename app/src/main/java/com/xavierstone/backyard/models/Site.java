@@ -1,4 +1,4 @@
-package com.xavierstone.backyard;
+package com.xavierstone.backyard.models;
 
 import com.google.android.gms.maps.model.LatLng;
 

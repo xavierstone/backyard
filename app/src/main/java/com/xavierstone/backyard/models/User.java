@@ -1,4 +1,4 @@
-package com.xavierstone.backyard;
+package com.xavierstone.backyard.models;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -6,6 +6,9 @@ import java.util.ArrayList;
 
 // Represents the user
 public class User {
+    // Static current user
+    private static User currentUser;
+
     // Attributes
     private String name; // single field for first name, last name, nickname etc.
     private String email; // email address
@@ -33,6 +36,9 @@ public class User {
         createdPhotos = new ArrayList<>();
     }
 
+    // Static getUser method
+    public static User getCurrentUser() { return currentUser; }
+
     // Setters
     public void setName(String name) { this.name = name; }
     public void setEmail(String email) { this.email = email; }
@@ -51,6 +57,15 @@ public class User {
     public ArrayList<Rant> getRants() { return rants; }
     public ArrayList<Site> getCreatedSites() { return createdSites; }
     public ArrayList<Photo> getCreatedPhotos() { return createdPhotos; }
+
+    // Sign In
+    // TODO: correctly implement sign in
+    public static User signIn(String email, String password) {
+        if (currentUser == null)
+            currentUser = new User("test", email, password);
+
+        return currentUser;
+    }
 
     // Validate credentials
     public boolean validateSignIn() {

@@ -1,4 +1,4 @@
-package com.xavierstone.backyard;
+package com.xavierstone.backyard.db;
 
 /*
 This class holds information about a Table in the database

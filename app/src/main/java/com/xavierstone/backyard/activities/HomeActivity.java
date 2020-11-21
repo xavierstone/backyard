@@ -1,10 +1,11 @@
-package com.xavierstone.backyard;
+package com.xavierstone.backyard.activities;
 
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.widget.Button;
 import android.widget.SearchView;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -21,6 +22,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.xavierstone.backyard.R;
+import com.xavierstone.backyard.db.DBData;
+import com.xavierstone.backyard.db.DBHandler;
+import com.xavierstone.backyard.models.User;
 
 import java.util.ArrayList;
 
@@ -38,6 +43,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
     public static ArrayList<DBData> searchResults = new ArrayList<>();
 
     private GoogleMap googleMap;
+    private Button signButton;
 
     RatingBar ratingBar;
 
@@ -45,6 +51,9 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        // Initialize signButton
+        signButton = findViewById(R.id.signButton);
 
         // Initialize Search Bar
         final SearchView searchView = findViewById(R.id.searchBar);
@@ -80,6 +89,17 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         mapFragment.getMapAsync(this);
 
         //ratingBar = findViewById(R.id.ratingBarHome);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Set text of Sign In Button to reflect sign in status
+        if (User.getCurrentUser() == null)
+            signButton.setText(R.string.signButtonText);
+        else
+            signButton.setText(R.string.signButtonTextAlt);
     }
 
     // Compartmentalizes the query process

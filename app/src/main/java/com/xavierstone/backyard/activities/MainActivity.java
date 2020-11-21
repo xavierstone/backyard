@@ -1,13 +1,18 @@
-package com.xavierstone.backyard;
+package com.xavierstone.backyard.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.widget.TextView;
+
+import com.xavierstone.backyard.R;
+import com.xavierstone.backyard.models.User;
 
 /*
 Page the app opens to, asks permissions
@@ -15,18 +20,13 @@ Page the app opens to, asks permissions
 
 public class MainActivity extends AppCompatActivity {
 
-    // userID is required by many other classes for now
-    public static int userID = 0;
-
     // Permission managment
     public static int LOCATION_REQUEST=0;
     public static int STORAGE_REQUEST=1;
 
-    private final String locationRequest[] = new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION,
+    private final String[] locationRequest = new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION,
             android.Manifest.permission.ACCESS_FINE_LOCATION};
-    private final String storageRequest[] = new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE};
-
-    boolean allowedPermissions[];
+    private final String[] storageRequest = new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE};
 
     //private CallbackManager callbackManager = CallbackManager.Factory.create();
 
@@ -43,26 +43,10 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         // Check for permissions, global variable used in onRequestPermissionsResult
-        allowedPermissions = checkPermissions();
+        checkPermissions();
 
-        // Determine Initial Permission to request
-        // Request is processed in onRequestPermissionsResult,
-        // then second permission is requested if applicable
-
-        // If location permission
-        if (allowedPermissions[LOCATION_REQUEST] == true) {
-            // If storage permission too
-            if (allowedPermissions[STORAGE_REQUEST] == true) {
-                // Go to home
-                goToHome();
-            }else {
-                // Otherwise, request storage permission
-                ActivityCompat.requestPermissions(this, storageRequest, STORAGE_REQUEST);
-            }
-        }else {
-            // Otherwise, request location permission
-            ActivityCompat.requestPermissions(this, locationRequest, LOCATION_REQUEST);
-        }
+        // Initialize test user
+        User.signIn("test@test.com","test");
 
         /*
         // Hardcode database values
@@ -153,26 +137,61 @@ public class MainActivity extends AppCompatActivity {
         //LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
         //loginButton.setReadPermissions(Arrays.asList(EMAIL));
         // If you are using in a fragment, call loginButton.setFragment(this);
+
+        // Go to Home
+        goToHome();
     }
 
-    private boolean[] checkPermissions(){
-        // Initialize results
-        boolean results[] = { false, false };
+    private void checkPermissions(){
+        // Determine Initial Permission to request
+        // Request is processed in onRequestPermissionsResult,
+        // then second permission is requested if applicable
 
-        // Check location
-        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            // Location granted
-            results[LOCATION_REQUEST] = true;
+        // If location permission
+        if (checkPermission(this, LOCATION_REQUEST)) {
+            // Check storage permission
+            if (!checkPermission(this, STORAGE_REQUEST)) {
+                // If not, request storage permission
+                ActivityCompat.requestPermissions(this, storageRequest, STORAGE_REQUEST);
+            }
+        }else {
+            // Otherwise, request location permission
+            ActivityCompat.requestPermissions(this, locationRequest, LOCATION_REQUEST);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
+        // Request storage after Location request has resulted
+        if (requestCode == LOCATION_REQUEST){
+            // Request storage
+            ActivityCompat.requestPermissions(this, storageRequest, STORAGE_REQUEST);
+        }
+    }
+
+    public static boolean checkPermission(Activity context, int permissionID) {
+        int approved = PackageManager.PERMISSION_GRANTED;
+        boolean permGranted = false;
+
+        // If permissionID is location request
+        if (permissionID == LOCATION_REQUEST) {
+            // Get permission strings
+            String coarseLocPerm = Manifest.permission.ACCESS_COARSE_LOCATION;
+            String fineLocPerm = Manifest.permission.ACCESS_FINE_LOCATION;
+
+            // Check permission
+            permGranted = ( ContextCompat.checkSelfPermission(context, coarseLocPerm) == approved
+                    &&  ContextCompat.checkSelfPermission(context, fineLocPerm) == approved);
+
+        }else if (permissionID == STORAGE_REQUEST) { // If permission ID is storage request
+            // Get permission string
+            String storagePerm = Manifest.permission.READ_EXTERNAL_STORAGE;
+
+            // Check permission
+            permGranted = ( ContextCompat.checkSelfPermission(context, storagePerm) == approved );
         }
 
-        // Check storage
-        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.READ_EXTERNAL_STORAGE ) == PackageManager.PERMISSION_GRANTED){
-            // Storage granted
-            results[STORAGE_REQUEST] = true;
-        }
-
-        return results;
+        return permGranted;
     }
 
     /*@Override
@@ -180,19 +199,6 @@ public class MainActivity extends AppCompatActivity {
         callbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
     }*/
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
-        // Don't check results, users are allowed to deny the permissions
-        // Just check to see if storage is allowed or asked, if not, ask
-        if (allowedPermissions[STORAGE_REQUEST] == true || requestCode == STORAGE_REQUEST){
-            // Storage approved too, go to home
-            goToHome();
-        }else{
-            // Request storage
-            ActivityCompat.requestPermissions(this, storageRequest, STORAGE_REQUEST);
-        }
-    }
 
     public void goToHome() {
         // God mode is hardcoded

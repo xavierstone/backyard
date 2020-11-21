@@ -1,4 +1,4 @@
-package com.xavierstone.backyard;
+package com.xavierstone.backyard.models;
 
 // Represents a photo, must be associated with a user and a campsite
 public class Photo {
