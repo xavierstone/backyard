@@ -11,6 +11,7 @@ public class User {
     private static User currentUser;
 
     // Attributes
+    private long id; // SQLite ID
     private String name; // single field for first name, last name, nickname etc.
     private String email; // email address
     private String password; // plain text password
@@ -24,8 +25,9 @@ public class User {
     // Marker for site the user is currently viewing/interacting with
     private Site currentSite;
 
-    public User(String name, String email, String password){
+    public User(long id, String name, String email, String password){
         // create user with specified attributes
+        this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
@@ -50,6 +52,7 @@ public class User {
     public void addFave(Site site) { faves.add(site); }
 
     // Getters
+    public long getId() { return id; }
     public String getName() { return name; }
     public String getEmail() { return email; }
     public String getPassword() { return password; }
@@ -65,7 +68,7 @@ public class User {
     // TODO: correctly implement sign in
     public static User signIn(String email, String password) {
         if (currentUser == null)
-            currentUser = new User("test", email, password);
+            currentUser = new User(0,"test", email, password);
 
         return currentUser;
     }
@@ -77,22 +80,23 @@ public class User {
     }
 
     // Creator methods
+    // Need updating to properly handle ID field with database
 
     // Create a campsite
-    public Site createCampsite(String name, LatLng location, String skinny){
-        return new Site(this, name, location, skinny);
+    public Site createCampsite(long id, String name, LatLng location, String skinny){
+        return new Site(this, id, name, location, skinny);
     }
 
     // Add a rant to the current site
     public Rant addRant(byte stars, String words) {
-        Rant newRant = new Rant(this, currentSite, stars, words);       // create rant
+        Rant newRant = new Rant(this, currentSite, id, stars, words);       // create rant
         currentSite.registerRant(newRant);                                      // register with campsite
         return newRant;
     }
 
     // Add a photo to the current site
     public Photo addPhoto(String uri) {
-        Photo newPhoto = new Photo(this, currentSite, uri);     // create photo
+        Photo newPhoto = new Photo(this, currentSite, id, uri);     // create photo
         currentSite.registerPhoto(newPhoto);                    // register with campsite
         return newPhoto;
     }

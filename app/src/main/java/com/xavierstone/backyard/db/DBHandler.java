@@ -204,6 +204,7 @@ public class DBHandler extends SQLiteOpenHelper {
         // Iteratively translate results
         for (DBData rawResult : rawResults){
             // Parse attributes
+            long id = Long.parseLong(rawResult.getData("id"));
             String name = rawResult.getData("name");
             double lat = Double.parseDouble(rawResult.getData("lat"));
             double lng = Double.parseDouble(rawResult.getData("long"));
@@ -213,7 +214,7 @@ public class DBHandler extends SQLiteOpenHelper {
             LatLng location = new LatLng(lat, lng);
 
             // Add new Site object
-            results.add(new Site(User.getCurrentUser(), name, location, skinny));
+            results.add(User.getCurrentUser().createCampsite(id, name, location, skinny));
         }
 
         return results;

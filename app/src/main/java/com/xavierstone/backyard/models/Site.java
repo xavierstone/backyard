@@ -7,6 +7,7 @@ import java.util.ArrayList;
 // Represents the campsite
 public class Site {
     // Attributes
+    private long id;
     private String name; // campsite name/title
     private LatLng location; // site location implemented as Google LatLng object (latitude/longitude pair)
     private String skinny; // site description
@@ -17,9 +18,10 @@ public class Site {
     private final ArrayList<Rant> rants; // site reviews
 
     // Constructor should be called before adding any photos or reviews
-    public Site(User author, String name, LatLng location, String skinny) {
+    public Site(User author, long id, String name, LatLng location, String skinny) {
         // Copy arguments
         this.author = author;
+        this.id = id;
         this.name = name;
         this.location = location;
         this.skinny = skinny;
@@ -31,6 +33,7 @@ public class Site {
 
     // Getters
     public User getAuthor() { return author; }
+    public long getId() { return id; }
     public String getName() { return name; }
     public LatLng getLocation() { return location; }
     public String getSkinny() { return skinny; }
