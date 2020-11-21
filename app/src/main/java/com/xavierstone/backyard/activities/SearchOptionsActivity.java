@@ -83,7 +83,7 @@ public class SearchOptionsActivity extends AppCompatActivity {
             searchStatus.setText("No results found");
         } else if (searchResults.size() == 1) {
             // One result, go straight to page
-            DisplayCampsiteActivity.currentCampsite = Long.parseLong(searchResults.get(0).getData("id"));
+            //DisplayCampsiteActivity.currentCampsite = Long.parseLong(searchResults.get(0).getData("id"));
             Intent intent = new Intent(SearchOptionsActivity.this, DisplayCampsiteActivity.class);
             startActivity(intent);
         } else {

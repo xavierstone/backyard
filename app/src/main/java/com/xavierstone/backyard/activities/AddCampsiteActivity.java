@@ -18,6 +18,8 @@ import com.xavierstone.backyard.db.DBData;
 import com.xavierstone.backyard.db.DBHandler;
 import com.xavierstone.backyard.db.InternalStorage;
 import com.xavierstone.backyard.R;
+import com.xavierstone.backyard.models.Site;
+import com.xavierstone.backyard.models.User;
 
 import java.util.ArrayList;
 
@@ -25,6 +27,9 @@ import java.util.ArrayList;
 This activity allows the user to add a new campsite to the database
  */
 public class AddCampsiteActivity extends AppCompatActivity {
+
+    // Current User
+    private Site currentCampsite;
 
     // Text Fields
     TextView addCampsiteStatus;
@@ -69,6 +74,8 @@ public class AddCampsiteActivity extends AppCompatActivity {
             addPhotosButton.setVisibility(View.VISIBLE);
             addCampsiteStatus.setText("");
         }
+
+        currentCampsite = User.getCurrentUser().getCurrentSite();
     }
 
     // Returns to the home screen
@@ -133,6 +140,7 @@ public class AddCampsiteActivity extends AppCompatActivity {
 
     // Triggered when the Submit button is clicked
     public void addCampsite(View view){
+        /*
         // Open DB and insert new campsite
         DBHandler dbHandler = new DBHandler(this, null, null, 1);
         DBData campsite = new DBData(DBHandler.campsitesTable);
@@ -156,7 +164,7 @@ public class AddCampsiteActivity extends AppCompatActivity {
 
         // Pass control
         Intent intent = new Intent(AddCampsiteActivity.this, DisplayCampsiteActivity.class);
-        DisplayCampsiteActivity.currentCampsite = campsiteID;
-        startActivity(intent);
+        currentCampsite = campsiteID;
+        startActivity(intent);*/
     }
 }

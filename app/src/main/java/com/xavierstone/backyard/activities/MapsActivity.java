@@ -101,8 +101,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         for (int i = 0; i < markers.size(); i++) {
             if (markers.get(i).equals(marker)) {
                 Intent intent = new Intent(MapsActivity.this, DisplayCampsiteActivity.class);
-                DisplayCampsiteActivity.currentCampsite =
-                        Long.parseLong(SearchOptionsActivity.searchResults.get(i).getData("id"));
+                //DisplayCampsiteActivity.currentCampsite =
+                //        Long.parseLong(SearchOptionsActivity.searchResults.get(i).getData("id"));
                 startActivity(intent);
             }
         }

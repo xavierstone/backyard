@@ -92,9 +92,10 @@ public class ListResultsAdapter extends RecyclerView.Adapter<ListResultsAdapter.
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
+                /*
                 DisplayCampsiteActivity.currentCampsite = Long.parseLong(searchResults.get(position).getData("id"));
                 Intent intent = new Intent(context, DisplayCampsiteActivity.class);
-                context.startActivity(intent);
+                context.startActivity(intent);*/
             }
         });
     }

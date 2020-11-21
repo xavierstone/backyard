@@ -28,4 +28,8 @@
     <string name="signButtonText">Sign In</string>
     <string name="signButtonTextAlt">Sign Out</string>
     <string name="helpButtonText">Help</string>
+    <string name="noFilePerms">File permissions disabled, images cannot be loaded</string>
+    <string name="noSiteName">The Site that Can Be Named<br/>is Not the True Site</string>
+    <string name="noPicsFound">"Nobody was wearing clothes so we couldn't post any pictures."</string>
+    <string name="noSiteSkinny">The idiot who posted this was illiterate,<br/>so this is all you get.</string>
 </resources>

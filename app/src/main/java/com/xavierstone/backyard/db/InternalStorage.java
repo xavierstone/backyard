@@ -1,5 +1,6 @@
 package com.xavierstone.backyard.db;
 
+import android.Manifest;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

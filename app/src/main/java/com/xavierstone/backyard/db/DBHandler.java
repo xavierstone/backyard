@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.xavierstone.backyard.activities.MainActivity;
+import com.xavierstone.backyard.models.Photo;
 import com.xavierstone.backyard.models.Site;
 import com.xavierstone.backyard.models.User;
 
@@ -72,6 +73,14 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
     }
 
+    // assumed constructor
+    public DBHandler() {
+        super(MainActivity.currentActivity, null, null, 1);
+        this.context = MainActivity.currentActivity;
+        db = getWritableDatabase();
+        db.close();
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db){
         // Creates the tables
@@ -118,7 +127,7 @@ public class DBHandler extends SQLiteOpenHelper {
                 }else{
                     // Image
                     if (!multi) {
-                        DBData dbData = new DBData((DBHandler.campsitesTable));
+                        DBData dbData = new DBData(DBHandler.campsitesTable);
                         dbData.addData(data);
                         dataID = db.insert(dbData.getTableName(), null, dbData.getValues());
                         multi = true;
@@ -220,6 +229,33 @@ public class DBHandler extends SQLiteOpenHelper {
         return results;
     }
 
+    // Find photos based on the parent campsite
+    // Returns true if at least one photo was loaded
+    public boolean loadSitePhotos(Site parent) {
+        ArrayList<Photo> results = new ArrayList<>();
+
+        long parentId = parent.getId();
+
+        // Generate where clause
+        String whereClause = "campsite_id = \"" + parentId + "\"";
+
+        // Get raw results
+        ArrayList<DBData> rawResults = search(photosTable, whereClause);
+
+        // Iteratively translate results
+        for (DBData rawResult : rawResults){
+            // Parse attributes
+            long id = Long.parseLong(rawResult.getData("id"));
+            String filename = rawResult.getData("path");
+
+            // Add new Site object
+            // TODO: have the author reflect the author, currently not stored
+            parent.registerPhoto(new Photo(User.getCurrentUser(), parent, id, filename));
+        }
+
+        return !parent.getPhotos().isEmpty();
+    }
+
     // Searches for a single query in any column. Only exact matches can be used, no inequalities
     // or regex. Returns a list of results, even if there is only one.
     public ArrayList<DBData> search(Table table, String colName, String term){
@@ -253,7 +289,6 @@ public class DBHandler extends SQLiteOpenHelper {
 
         // Cursor moves through the data
         if (cursor.moveToFirst()) {
-            cursor.moveToFirst();
             do {
                 // Translate the data from the DB into the list
                 DBData dbData = new DBData(table);
