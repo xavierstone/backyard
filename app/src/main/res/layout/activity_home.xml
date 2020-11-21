@@ -57,24 +57,28 @@
             android:id="@+id/favesButton"
             style="@style/MainNavButton"
             android:drawableTop="@android:drawable/btn_star"
+            android:enabled="false"
             android:text="@string/favesButtonText" />
 
         <Button
             android:id="@+id/addButton"
             style="@style/MainNavButton"
             android:drawableTop="@android:drawable/ic_menu_add"
+            android:enabled="false"
             android:text="@string/addButtonText" />
 
         <Button
             android:id="@+id/signButton"
             style="@style/MainNavButton"
             android:drawableTop="@android:drawable/ic_lock_idle_lock"
+            android:enabled="false"
             android:text="@string/signButtonText" />
 
         <Button
             android:id="@+id/helpButton"
             style="@style/MainNavButton"
             android:drawableTop="@android:drawable/ic_menu_help"
+            android:enabled="false"
             android:onClick="goToSearchOptions"
             android:text="@string/helpButtonText" />
     </LinearLayout>
