@@ -1,6 +1,7 @@
 package com.xavierstone.backyard.models;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.xavierstone.backyard.db.DBHandler;
 
 import java.util.ArrayList;
 
