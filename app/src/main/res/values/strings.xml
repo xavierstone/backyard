@@ -28,4 +28,5 @@
     <string name="signButtonText">Sign In</string>
     <string name="signButtonTextAlt">Sign Out</string>
     <string name="helpButtonText">Help</string>
+    <string name="noFilePerms">File permissions disabled, images cannot be loaded</string>
 </resources>

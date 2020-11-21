@@ -35,16 +35,6 @@
                     app:srcCompat="@android:drawable/star_big_off"
                     tools:srcCompat="@android:drawable/btn_star_big_on" />
 
-                <com.facebook.share.widget.ShareButton
-
-                    android:id="@+id/share_btn"
-
-                    android:layout_width="96dp"
-
-                    android:layout_height="match_parent"
-
-                    android:contentDescription="@string/share" />
-
                 <ImageButton
                     android:id="@+id/imageButton7"
                     android:layout_width="91dp"

@@ -135,8 +135,10 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
             latLngs.add(curSite.getLocation());
 
             // Add marker to list
-            markers.add(googleMap.addMarker(new MarkerOptions().position(latLngs.get(i))
-                    .title(curSite.getName())));
+            Marker newMarker = googleMap.addMarker(new MarkerOptions().position(latLngs.get(i))
+                    .title(curSite.getName()));
+            newMarker.setTag(searchResults.get(i)); // tag with campsite
+            markers.add(newMarker);
 
             // Update LatLng Bounds
             if (latLngs.size() > 1){
@@ -206,13 +208,17 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
 
     @Override
     public void onInfoWindowClick(Marker marker){
-        for (int i = 0; i < markers.size(); i++) {
-            if (markers.get(i).equals(marker)) {
-                User.getCurrentUser().setCurrentSite(searchResults.get(i));
+        assert marker.getTag() != null;
 
-                Intent intent = new Intent(HomeActivity.this, DisplayCampsiteActivity.class);
-                startActivity(intent);
-            }
+        // Verify marker is tagged with a Site object
+        if (marker.getTag().getClass() == Site.class) {
+            Site current = (Site) marker.getTag();
+            // retrieve campsite tag and set current campsite
+            User.getCurrentUser().setCurrentSite(this,(Site) marker.getTag());
+
+            // Transfer to DisplayCampsiteActivity
+            Intent intent = new Intent(HomeActivity.this, DisplayCampsiteActivity.class);
+            startActivity(intent);
         }
     }
 

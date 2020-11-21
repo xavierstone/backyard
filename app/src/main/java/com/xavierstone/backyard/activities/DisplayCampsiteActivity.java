@@ -1,10 +1,8 @@
 package com.xavierstone.backyard.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +17,9 @@ import com.xavierstone.backyard.db.InternalStorage;
 import com.xavierstone.backyard.R;
 import com.xavierstone.backyard.db.DBData;
 import com.xavierstone.backyard.db.DBHandler;
+import com.xavierstone.backyard.models.Photo;
+import com.xavierstone.backyard.models.Site;
+import com.xavierstone.backyard.models.User;
 
 import java.util.ArrayList;
 
@@ -30,10 +31,11 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
 
     // DB Handler
     private DBHandler dbSite;
+    private Site currentSite;
 
     // Views
     TextView siteName;
-    TextView siteDescription;
+    TextView siteSkinny;
     TextView displayCampsiteStatus;
     ImageView campsitePhoto;
     ImageButton galleryBackButton;
@@ -43,20 +45,20 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
     RatingBar userRating;
     ImageButton favButton;
 
-    // Static variable for tracking campsiteID and current photo
-    // I've found this to be cleaner than passing data between Activities, in most cases
-    public static long currentCampsite = 0;
-    public static int currentPhoto = -1; // Represents position in list, not absolute ID
-    public static ArrayList<DBData> photos = new ArrayList<>();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_campsite);
 
+        // Initialize DB
+        dbSite = new DBHandler(this,null,null,1);
+
+        // Get current!
+        currentSite = User.getCurrentUser().getCurrentSite();
+
         // Load text fields
-        siteName = (TextView) findViewById(R.id.siteName);
-        siteDescription = (TextView) findViewById(R.id.siteDescription);
+        siteName = findViewById(R.id.siteName);
+        siteSkinny = findViewById(R.id.siteDescription);
         campsitePhoto = findViewById(R.id.campsitePhoto);
         galleryBackButton = findViewById(R.id.galleryBackButton);
         galleryForwardButton = findViewById(R.id.galleryForwardButton);
@@ -66,12 +68,8 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         userRating = findViewById(R.id.userRating);
         favButton = findViewById(R.id.favButton);
 
-        // Search database for current campsite (ID will have been passed by previous activity)
-        dbSite = new DBHandler(this,null,null,1);
-        DBData currentSite = dbSite.search(DBHandler.campsitesTable, "id", ""+currentCampsite).get(0);
-
         // Get rating
-        updateRatings();
+        //updateRatings();
 
         // Check for favorite
         // TODO: implement check for favorite
@@ -84,47 +82,40 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         }*/
 
         //Check for read external permission
-        boolean permission = (ContextCompat.checkSelfPermission( this,
-                android.Manifest.permission.READ_EXTERNAL_STORAGE ) == PackageManager.PERMISSION_GRANTED );
+        boolean storagePermission = MainActivity.checkPermission(this, MainActivity.STORAGE_REQUEST);
 
-        // Search DB for campsite photos
-        photos = dbSite.search(DBHandler.photosTable,"campsite_id",""+currentCampsite);
+        int numPhotos = currentSite.getPhotos().size();
 
         // Modify layout based on photo # and permissions
-        if (!permission){
+        if (!storagePermission){
             // Disable upload button, do not load images
             uploadButton.setEnabled(false);
-            displayCampsiteStatus.setText("File permissions disabled, images cannot be loaded");
+            displayCampsiteStatus.setText(R.string.noFilePerms);
         }else{
             // If there are any photos to display, do so
-            if (!photos.isEmpty()) {
+            if (numPhotos > 0) {
                 // Display ImageView and load first photo
                 campsitePhoto.setVisibility(View.VISIBLE);
-                currentPhoto = 0;
-                updatePhoto();
+                campsitePhoto.setImageBitmap(currentSite.loadCurrentPhoto(this));
 
                 // Hide status text
                 displayCampsiteStatus.setText("");
             }
 
-            if (photos.size() > 1){
-                // If multiple photos, display navigation
+            // If multiple photos, display navigation
+            if (numPhotos > 1){
                 galleryForwardButton.setVisibility(View.VISIBLE);
                 galleryBackButton.setVisibility(View.VISIBLE);
             }
         }
 
         // Set text fields with data from DB
-        siteName.setText(currentSite.getData("name"));
-        siteDescription.setText(currentSite.getData("description"));
-    }
-
-    // Updates the ImageView based on the current photo
-    private void updatePhoto(){
+        siteName.setText(currentSite.getName());
+        siteSkinny.setText(currentSite.getSkinny());
     }
 
     private void updateRatings(){
-        ArrayList<DBData> ratings = dbSite.search(DBHandler.ratingsTable, "campsite_id", ""+currentCampsite);
+        ArrayList<DBData> ratings = dbSite.search(DBHandler.ratingsTable, "campsite_id", ""+ currentSite);
         double totalRating = 0;
         for (int i = 0; i < ratings.size(); i++){
             totalRating+=Double.parseDouble(ratings.get(i).getData("stars"));
@@ -133,21 +124,15 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         ratingBar.setRating((float)totalRating);
     }
 
-    private Bitmap getCurrentBitmap(){
-        DBData photo = photos.get(currentPhoto);
+    /*
+    private Bitmap getBitmap(Photo photo){
         if (photo.getData("type").equals("1")) {
             return InternalStorage.loadInternalImage(this, photo.getData("path"));
         }else{
-            Uri uri = Uri.parse(InternalStorage.getDrawPath() + photo.getData("path"));
+            Uri uri = Uri.parse(InternalStorage.getDrawPath() + photo.getUri());
             return InternalStorage.loadExternalImage(this, uri.toString());
         }
-    }
-
-    // Returns to home screen
-    public void goHome(View view){
-        Intent intent = new Intent(DisplayCampsiteActivity.this, HomeActivity.class);
-        startActivity(intent);
-    }
+    }*/
 
     // Adds the campsite as a favorite
     public void addFavorite(View view){
@@ -167,19 +152,19 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
 
     // Gallery Navigation
     public void galleryBack(View view){
-        if (currentPhoto!=-1){
-            currentPhoto-=1;
-            if (currentPhoto<0) currentPhoto = photos.size()-1;
-            updatePhoto();
-        }
+        // Decrement photo
+        currentSite.adjustCurrentPhoto(-1);
+
+        // Load photo
+        campsitePhoto.setImageBitmap(currentSite.loadCurrentPhoto(this));
     }
 
     public void galleryForward(View view){
-        if (currentPhoto!=-1){
-            currentPhoto+=1;
-            if (currentPhoto>=photos.size()) currentPhoto = 0;
-            updatePhoto();
-        }
+        // Increment photo
+        currentSite.adjustCurrentPhoto(-1);
+
+        // Load photo
+        campsitePhoto.setImageBitmap(currentSite.loadCurrentPhoto(this));
     }
 
     // Adds a rating
@@ -225,13 +210,14 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        /*
         if (resultCode == RESULT_OK){
             // Read photo path into DB
             DBHandler dbHandler = new DBHandler(this, null, null, 1);
             Uri targetUri = data.getData();
 
             DBData newPhoto = new DBData(DBHandler.photosTable);
-            newPhoto.addData(new String[]{"0",""+currentCampsite, "1", "" });
+            newPhoto.addData(new String[]{"0",""+ currentSite, "1", "" });
             long photoID = dbHandler.insert(newPhoto);
 
             // Internal storage and update path
@@ -249,13 +235,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
                 galleryBackButton.setEnabled(true);
                 galleryForwardButton.setEnabled(true);
             }
-        }
-    }
-
-    // Goes to the search page
-    public void goToSearchOptions(View view){
-        Intent intent = new Intent(DisplayCampsiteActivity.this, SearchOptionsActivity.class);
-        startActivity(intent);
+        }*/
     }
 
     @Override

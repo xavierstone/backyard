@@ -1,6 +1,10 @@
 package com.xavierstone.backyard.models;
 
+import android.app.Activity;
+import android.graphics.Bitmap;
+
 import com.google.android.gms.maps.model.LatLng;
+import com.xavierstone.backyard.db.DBHandler;
 
 import java.util.ArrayList;
 
@@ -11,6 +15,9 @@ public class Site {
     private String name; // campsite name/title
     private LatLng location; // site location implemented as Google LatLng object (latitude/longitude pair)
     private String skinny; // site description
+
+    // Current Photo tracker
+    private int currentPhoto;
 
     // References
     private final User author;
@@ -25,6 +32,8 @@ public class Site {
         this.name = name;
         this.location = location;
         this.skinny = skinny;
+
+        this.currentPhoto = 0;
 
         // Initialize ArrayLists
         photos = new ArrayList<>();
@@ -62,10 +71,36 @@ public class Site {
     public void setLocation(User author, LatLng location) { if (hasPermission(author)) this.location = location; }
     public void setSkinny(User author, String skinny) { if (hasPermission(author)) this.skinny = skinny; }
 
+    // Load campsite info
+    public void loadCampsite(Activity context) {
+        // Just photos for now
+        // TODO: add rants
+
+        // Load photos from DB
+        DBHandler dbHandler = new DBHandler(context, null, null, 1);
+        dbHandler.loadSitePhotos(this);
+    }
+
+    // Get current photo
+    public Bitmap loadCurrentPhoto(Activity context) {
+        if (photos.isEmpty())
+            return null;
+
+        return photos.get(currentPhoto).loadImage(context);
+    }
+
+    // Moves the current photo by an increment, only designed for 1 or -1
+    public void adjustCurrentPhoto(int increment) {
+        if (Math.abs(increment) == 1) {
+            currentPhoto += increment;
+
+            // Wrap around photos array
+            if (currentPhoto < 0) currentPhoto = photos.size() - 1;
+            if (currentPhoto >= photos.size()) currentPhoto = 0;
+        }
+    }
+
     // Registers
     public void registerPhoto(Photo photo) { photos.add(photo); }
     public void registerRant(Rant rant) { rants.add(rant); }
-
-    // Load photo from internal storage
-    // TODO: implement photo loader, calls method in Photo
 }

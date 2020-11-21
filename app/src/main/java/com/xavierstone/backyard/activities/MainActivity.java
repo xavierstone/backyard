@@ -21,6 +21,9 @@ Page the app opens to, asks permissions
 
 public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
+    // Package name
+    public static String PACKAGE_NAME;
+
     // Permission managment
     public static int LOCATION_REQUEST=0;
     public static int STORAGE_REQUEST=1;
@@ -33,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_2);
+
+        PACKAGE_NAME = this.getPackageName();
     }
 
     @Override

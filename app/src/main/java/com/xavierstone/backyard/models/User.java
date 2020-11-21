@@ -1,5 +1,7 @@
 package com.xavierstone.backyard.models;
 
+import android.app.Activity;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.xavierstone.backyard.db.DBHandler;
 
@@ -46,7 +48,12 @@ public class User {
     public void setName(String name) { this.name = name; }
     public void setEmail(String email) { this.email = email; }
     public void setPassword(String password) { this.password = password; }
-    public void setCurrentSite(Site site) { this.currentSite = site; }
+
+    // Set current site, forces a full load of site data
+    public void setCurrentSite(Activity context, Site site) {
+        this.currentSite = site;
+        currentSite.loadCampsite(context);
+    }
 
     // Add favorite site
     public void addFave(Site site) { faves.add(site); }
