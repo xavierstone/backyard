@@ -36,13 +36,13 @@ public class Photo {
 
     // Load from internal storage
     // Returns bitmap
-    public Bitmap loadImage(Activity context){
+    public Bitmap loadImage(){
         String filepath = resourcePrefix + MainActivity.PACKAGE_NAME + drawableDirectory + filename;
 
         Uri targetUri = Uri.parse(filepath);
         Bitmap bitmap;
         try {
-            bitmap = BitmapFactory.decodeStream(context.getContentResolver().openInputStream(targetUri));
+            bitmap = BitmapFactory.decodeStream(MainActivity.currentActivity.getContentResolver().openInputStream(targetUri));
             return bitmap;
         } catch (FileNotFoundException e) {
             e.printStackTrace();

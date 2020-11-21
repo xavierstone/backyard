@@ -73,6 +73,14 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
     }
 
+    // assumed constructor
+    public DBHandler() {
+        super(MainActivity.currentActivity, null, null, 1);
+        this.context = MainActivity.currentActivity;
+        db = getWritableDatabase();
+        db.close();
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db){
         // Creates the tables

@@ -50,8 +50,10 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_campsite);
 
+        MainActivity.currentActivity = this;
+
         // Initialize DB
-        dbSite = new DBHandler(this,null,null,1);
+        dbSite = new DBHandler();
 
         // Get current!
         currentSite = User.getCurrentUser().getCurrentSite();
@@ -96,7 +98,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
             if (numPhotos > 0) {
                 // Display ImageView and load first photo
                 campsitePhoto.setVisibility(View.VISIBLE);
-                campsitePhoto.setImageBitmap(currentSite.loadCurrentPhoto(this));
+                campsitePhoto.setImageBitmap(currentSite.loadCurrentPhoto());
 
                 // Hide status text
                 displayCampsiteStatus.setText("");
@@ -156,7 +158,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         currentSite.adjustCurrentPhoto(-1);
 
         // Load photo
-        campsitePhoto.setImageBitmap(currentSite.loadCurrentPhoto(this));
+        campsitePhoto.setImageBitmap(currentSite.loadCurrentPhoto());
     }
 
     public void galleryForward(View view){
@@ -164,7 +166,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         currentSite.adjustCurrentPhoto(-1);
 
         // Load photo
-        campsitePhoto.setImageBitmap(currentSite.loadCurrentPhoto(this));
+        campsitePhoto.setImageBitmap(currentSite.loadCurrentPhoto());
     }
 
     // Adds a rating

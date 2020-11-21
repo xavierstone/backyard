@@ -50,9 +50,9 @@ public class User {
     public void setPassword(String password) { this.password = password; }
 
     // Set current site, forces a full load of site data
-    public void setCurrentSite(Activity context, Site site) {
+    public void setCurrentSite(Site site) {
         this.currentSite = site;
-        currentSite.loadCampsite(context);
+        currentSite.loadCampsite();
     }
 
     // Add favorite site

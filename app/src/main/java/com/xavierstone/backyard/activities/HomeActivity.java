@@ -54,10 +54,12 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        MainActivity.currentActivity = this;
+
         // Initialize signButton
         signButton = findViewById(R.id.signButton);
 
-        dbHome = new DBHandler(this, null, null, 1);
+        dbHome = new DBHandler();
 
         // Initialize Search Bar
         final SearchView searchView = findViewById(R.id.searchBar);
@@ -214,7 +216,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         if (marker.getTag().getClass() == Site.class) {
             Site current = (Site) marker.getTag();
             // retrieve campsite tag and set current campsite
-            User.getCurrentUser().setCurrentSite(this,(Site) marker.getTag());
+            User.getCurrentUser().setCurrentSite((Site) marker.getTag());
 
             // Transfer to DisplayCampsiteActivity
             Intent intent = new Intent(HomeActivity.this, DisplayCampsiteActivity.class);

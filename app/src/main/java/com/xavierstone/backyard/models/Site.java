@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.xavierstone.backyard.activities.MainActivity;
 import com.xavierstone.backyard.db.DBHandler;
 
 import java.util.ArrayList;
@@ -72,21 +73,21 @@ public class Site {
     public void setSkinny(User author, String skinny) { if (hasPermission(author)) this.skinny = skinny; }
 
     // Load campsite info
-    public void loadCampsite(Activity context) {
+    public void loadCampsite() {
         // Just photos for now
         // TODO: add rants
 
         // Load photos from DB
-        DBHandler dbHandler = new DBHandler(context, null, null, 1);
+        DBHandler dbHandler = new DBHandler();
         dbHandler.loadSitePhotos(this);
     }
 
     // Get current photo
-    public Bitmap loadCurrentPhoto(Activity context) {
+    public Bitmap loadCurrentPhoto() {
         if (photos.isEmpty())
             return null;
 
-        return photos.get(currentPhoto).loadImage(context);
+        return photos.get(currentPhoto).loadImage();
     }
 
     // Moves the current photo by an increment, only designed for 1 or -1
