@@ -1,4 +1,4 @@
-package com.xavierstone.backyard;
+package com.xavierstone.backyard.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -14,6 +14,11 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
+import com.xavierstone.backyard.db.InternalStorage;
+import com.xavierstone.backyard.R;
+import com.xavierstone.backyard.db.DBData;
+import com.xavierstone.backyard.db.DBHandler;
 
 import java.util.ArrayList;
 
@@ -66,12 +71,14 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         updateRatings();
 
         // Check for favorite
+        // TODO: implement check for favorite
+        /*
         if (!dbHandler.search(DBHandler.favoritesTable, "user_id == "+MainActivity.userID +
                 " AND campsite_id == "+currentCampsite).isEmpty()){
             // Site is favorited, set star
             Uri uri = Uri.parse(InternalStorage.getDrawPath()+"star");
             favButton.setImageBitmap(InternalStorage.loadExternalImage(this, uri.toString()));
-        }
+        }*/
 
         //Check for read external permission
         boolean permission = (ContextCompat.checkSelfPermission( this,
@@ -142,6 +149,8 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
 
     // Adds the campsite as a favorite
     public void addFavorite(View view){
+        /*
+        TODO: implement add favorite
         DBHandler dbHandler = new DBHandler(this,null,null,1);
         if (dbHandler.search(DBHandler.favoritesTable, "user_id == "+MainActivity.userID +
                 " AND campsite_id == "+currentCampsite).isEmpty()) {
@@ -151,12 +160,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
 
             Uri uri = Uri.parse(InternalStorage.getDrawPath() + "star");
             favButton.setImageBitmap(InternalStorage.loadExternalImage(this, uri.toString()));
-        }
-    }
-
-    // Posts the campsite to Facebook
-    public void facebookShare(View view){
-
+        }*/
     }
 
     // Gallery Navigation
@@ -178,6 +182,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
 
     // Adds a rating
     public void addRating(View view){
+        /* TODO: add rating
         userRating.setVisibility(View.VISIBLE);
         DBHandler dbHandler = new DBHandler(this, null, null, 1);
         ArrayList<DBData> ratings = dbHandler.search(DBHandler.ratingsTable, "user_id", ""+MainActivity.userID);
@@ -204,7 +209,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
                     updateRatings();
                 }
             }
-        });
+        });*/
     }
 
     // Upload a photo from the Gallery App

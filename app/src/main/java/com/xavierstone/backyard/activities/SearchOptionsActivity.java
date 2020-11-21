@@ -1,4 +1,4 @@
-package com.xavierstone.backyard;
+package com.xavierstone.backyard.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -18,6 +18,9 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.xavierstone.backyard.R;
+import com.xavierstone.backyard.db.DBData;
+import com.xavierstone.backyard.db.DBHandler;
 
 import java.util.ArrayList;
 

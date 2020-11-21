@@ -1,4 +1,4 @@
-package com.xavierstone.backyard;
+package com.xavierstone.backyard.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.xavierstone.backyard.R;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -38,6 +40,8 @@ public class CreateAccountActivity extends AppCompatActivity {
     }
 
     public void createAccount(View view) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        /*
+        TODO: implement create account
         // Open DB
         DBHandler dbHandler = new DBHandler(this, null, null, 1);
 
@@ -68,6 +72,6 @@ public class CreateAccountActivity extends AppCompatActivity {
             // Clear email and password fields
             emailAddressBox.setText("");
             passwordBox.setText("");
-        }
+        }*/
     }
 }

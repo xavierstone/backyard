@@ -1,6 +1,5 @@
-package com.xavierstone.backyard;
+package com.xavierstone.backyard.activities;
 
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
@@ -17,6 +16,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.xavierstone.backyard.R;
+import com.xavierstone.backyard.db.DBData;
 
 import java.util.ArrayList;
 

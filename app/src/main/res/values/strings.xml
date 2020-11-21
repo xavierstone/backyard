@@ -26,5 +26,6 @@
     <string name="favesButtonText">Faves</string>
     <string name="addButtonText">Add</string>
     <string name="signButtonText">Sign In</string>
+    <string name="signButtonTextAlt">Sign Out</string>
     <string name="helpButtonText">Help</string>
 </resources>

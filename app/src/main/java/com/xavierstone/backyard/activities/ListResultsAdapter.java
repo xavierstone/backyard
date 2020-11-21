@@ -1,4 +1,4 @@
-package com.xavierstone.backyard;
+package com.xavierstone.backyard.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +13,11 @@ import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.xavierstone.backyard.db.InternalStorage;
+import com.xavierstone.backyard.R;
+import com.xavierstone.backyard.db.DBData;
+import com.xavierstone.backyard.db.DBHandler;
 
 import java.util.ArrayList;
 

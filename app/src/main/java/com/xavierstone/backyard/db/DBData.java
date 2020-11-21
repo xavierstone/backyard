@@ -1,4 +1,4 @@
-package com.xavierstone.backyard;
+package com.xavierstone.backyard.db;
 
 import android.content.ContentValues;
 

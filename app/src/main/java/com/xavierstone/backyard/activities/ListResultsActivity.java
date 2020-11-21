@@ -1,10 +1,12 @@
-package com.xavierstone.backyard;
+package com.xavierstone.backyard.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+
+import com.xavierstone.backyard.R;
 
 // Could this be made to work with favorites too?
 // Use the Recycler view

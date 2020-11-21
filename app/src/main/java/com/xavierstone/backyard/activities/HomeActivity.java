@@ -1,12 +1,11 @@
-package com.xavierstone.backyard;
+package com.xavierstone.backyard.activities;
 
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.widget.Button;
 import android.widget.SearchView;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
@@ -21,6 +20,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.xavierstone.backyard.R;
+import com.xavierstone.backyard.db.DBHandler;
+import com.xavierstone.backyard.models.Site;
+import com.xavierstone.backyard.models.User;
 
 import java.util.ArrayList;
 
@@ -32,12 +35,17 @@ Integrates map functionality with main navigation and search bar
 public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWindowClickListener, OnMapReadyCallback, GoogleMap.OnMapClickListener {
 
     // Marker list
-    private ArrayList<Marker> markers = new ArrayList<>();
+    private final ArrayList<Marker> markers = new ArrayList<>();
+
+    // DBHandler
+    private DBHandler dbHome;
 
     // Search results array, can be referenced from MapsActivity
-    public static ArrayList<DBData> searchResults = new ArrayList<>();
+    private ArrayList<Site> searchResults = new ArrayList<>();
 
+    // Views
     private GoogleMap googleMap;
+    private Button signButton;
 
     RatingBar ratingBar;
 
@@ -45,6 +53,11 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        // Initialize signButton
+        signButton = findViewById(R.id.signButton);
+
+        dbHome = new DBHandler(this, null, null, 1);
 
         // Initialize Search Bar
         final SearchView searchView = findViewById(R.id.searchBar);
@@ -54,11 +67,11 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // Search for query
-                updateSearchResults(query);
+                searchResults = dbHome.find(query);
 
                 // For non-empty result lists, update map
                 if (!searchResults.isEmpty()) {
-                    displayMapResults();
+                    updateMapResults();
                 }
 
                 // Clear query
@@ -82,31 +95,33 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         //ratingBar = findViewById(R.id.ratingBarHome);
     }
 
-    // Compartmentalizes the query process
-    private void updateSearchResults(String term) {
-        // Clear search results
-        searchResults.clear();
+    @Override
+    protected void onResume() {
+        super.onResume();
 
-        // Construct where clause
-        String whereClause = "";
-
-        // Form query
-        if (!term.isEmpty()) {
-            // If name is provided, start clause
-            whereClause = "(name LIKE \"%" + term + "%\" OR " +
-                    "description LIKE \"%" + term + "%\")";
-        }
-
-        // Pass query to search method
-        DBHandler dbHandler = new DBHandler(this, null, null, 1);
-        searchResults = dbHandler.search(DBHandler.campsitesTable, whereClause);
+        // Set text of Sign In Button to reflect sign in status
+        if (User.getCurrentUser() == null)
+            signButton.setText(R.string.signButtonText);
+        else
+            signButton.setText(R.string.signButtonTextAlt);
     }
 
-    private void displayMapResults(){
+    @Override
+    protected void onDestroy() {
+        dbHome.close();
+        super.onDestroy();
+    }
+
+    private void updateMapResults(){
+        // Clear all markers from map
+        for (Marker marker : markers)
+            marker.remove();
+        markers.clear();
+
+        // Initialize Camera Bound Guide
         ArrayList<LatLng> latLngs = new ArrayList<>();
         LatLngBounds.Builder bounds = null;
-
-        DBData curData = null;
+        Site curSite = null;
         double curLat = 0;
         double curLng = 0;
         double spread = 0;
@@ -114,16 +129,14 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         // Loop through results list and add a marker for each site
         for (int i=0; i<searchResults.size(); i++){
 
-            curData = searchResults.get(i);
-            curLat = Double.parseDouble(curData.getData("lat"));
-            curLng = Double.parseDouble(curData.getData("long"));
+            curSite = searchResults.get(i);
 
             // Add lat/long to array list
-            latLngs.add(new LatLng(curLat, curLng));
+            latLngs.add(curSite.getLocation());
 
             // Add marker to list
             markers.add(googleMap.addMarker(new MarkerOptions().position(latLngs.get(i))
-                    .title(curData.getData("name"))));
+                    .title(curSite.getName())));
 
             // Update LatLng Bounds
             if (latLngs.size() > 1){
@@ -140,22 +153,22 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
             Location centerLoc = new Location("");
             centerLoc.setLatitude(bounds.build().getCenter().latitude);
             centerLoc.setLongitude(bounds.build().getCenter().longitude);
-
             double curSpread = curLoc.distanceTo(centerLoc);
-
             if (curSpread>spread) spread = curSpread;
         }
 
-        int zoom = (int) (14 - Math.floor(Math.log10(spread/500)/Math.log10(2)));
+        // Calculate zoom level
+        // Zoom limits for Google Camera
+        int MAX_ZOOM = 14;
+        int zoom = (int) (MAX_ZOOM - Math.floor(Math.log10(spread/500)/Math.log10(2)));
+        if (zoom > MAX_ZOOM) zoom = MAX_ZOOM;
 
         assert bounds != null;
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bounds.build().getCenter(), zoom));
         googleMap.setOnInfoWindowClickListener(this);
 
         // Check for location permission before enabling myLocation
-        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION )
-                == PackageManager.PERMISSION_GRANTED ) {
-
+        if ( MainActivity.checkPermission(this, MainActivity.LOCATION_REQUEST )) {
             googleMap.setMyLocationEnabled(true);
         }
 
@@ -195,9 +208,9 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
     public void onInfoWindowClick(Marker marker){
         for (int i = 0; i < markers.size(); i++) {
             if (markers.get(i).equals(marker)) {
+                User.getCurrentUser().setCurrentSite(searchResults.get(i));
+
                 Intent intent = new Intent(HomeActivity.this, DisplayCampsiteActivity.class);
-                DisplayCampsiteActivity.currentCampsite =
-                        Long.parseLong(searchResults.get(i).getData("id"));
                 startActivity(intent);
             }
         }

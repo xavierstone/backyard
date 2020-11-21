@@ -1,4 +1,4 @@
-package com.xavierstone.backyard;
+package com.xavierstone.backyard.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -13,6 +13,11 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.xavierstone.backyard.db.DBData;
+import com.xavierstone.backyard.db.DBHandler;
+import com.xavierstone.backyard.db.InternalStorage;
+import com.xavierstone.backyard.R;
 
 import java.util.ArrayList;
 
