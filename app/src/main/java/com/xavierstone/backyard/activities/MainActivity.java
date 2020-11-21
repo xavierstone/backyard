@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import com.xavierstone.backyard.R;
+import com.xavierstone.backyard.db.DBHandler;
 import com.xavierstone.backyard.models.User;
 
 /*
@@ -30,8 +31,6 @@ public class MainActivity extends AppCompatActivity {
 
     //private CallbackManager callbackManager = CallbackManager.Factory.create();
 
-    //final DBHandler dbHandler = new DBHandler(this, null, null,1);
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,96 +46,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize test user
         User.signIn("test@test.com","test");
-
-        /*
-        // Hardcode database values
-        // Gorge Site
-        String text = "";
-
-        // Open file
-        try{
-            InputStream is = getAssets().open("campsites.txt");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            text = new String(buffer);
-        }catch (IOException ex){
-            ex.printStackTrace();
-        }
-
-        String c = "";
-        String subStr = "";
-        String[] colNames = DBHandler.campsitesTable.getColNames();
-        String[] data = new String[colNames.length];
-        data[0] = "0";
-        int fieldPos = 1;
-        long dataID = -1;
-        boolean skip = false;
-        boolean multi = false;
-
-        // Parse file
-        for (int i=0; i < text.length(); i++){
-            c = text.substring(i, i+1);
-
-            if ((!skip) && (c.equals("|") || c.equals("`"))){
-                if (fieldPos < colNames.length){
-                    if (fieldPos == 1){
-                        skip = !dbHandler.search(DBHandler.campsitesTable, "name", subStr).isEmpty();
-                    }
-                    data[fieldPos] = subStr;
-                }else{
-                    // Image
-                    if (!multi) {
-                        DBData dbData = new DBData((DBHandler.campsitesTable));
-                        dbData.addData(data);
-                        dataID = dbHandler.insert(dbData);
-                        multi = true;
-                    }
-
-                    DBData newPhoto = (new DBData(DBHandler.photosTable)).addData(new String[]{"0", ""+dataID, "0", subStr});
-                    dbHandler.insert(newPhoto);
-                }
-                subStr = "";
-                fieldPos += 1;
-            }else{
-                subStr += c;
-            }
-
-            if (c.equals("`")){
-                fieldPos = 1;
-                skip = false;
-                subStr = "";
-                multi = false;
-            }
-        }
-
-        /*
-        // Request permissions
-        // Coarse location
-        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION )
-                != PackageManager.PERMISSION_GRANTED ) {
-
-            ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  },
-                    PERMISSION_ACCESS_COARSE_LOCATION );
-        }
-
-        /*
-        // Fine location
-        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
-
-            ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_FINE_LOCATION  },
-                    PERMISSION_ACCESS_FINE_LOCATION );
-        }*/
-
-        // Load fields
-        //loginFeedbackView = (TextView) findViewById(R.id.loginFeedback);
-        //emailAddressBox = (EditText) findViewById(R.id.loginEmail);
-        //passwordBox = (EditText) findViewById(R.id.loginPassword);
-
-        //LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
-        //loginButton.setReadPermissions(Arrays.asList(EMAIL));
-        // If you are using in a fragment, call loginButton.setFragment(this);
 
         // Go to Home
         goToHome();

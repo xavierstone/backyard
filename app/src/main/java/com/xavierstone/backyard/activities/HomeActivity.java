@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.xavierstone.backyard.R;
 import com.xavierstone.backyard.db.DBData;
 import com.xavierstone.backyard.db.DBHandler;
+import com.xavierstone.backyard.models.Site;
 import com.xavierstone.backyard.models.User;
 
 import java.util.ArrayList;
@@ -37,11 +38,15 @@ Integrates map functionality with main navigation and search bar
 public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWindowClickListener, OnMapReadyCallback, GoogleMap.OnMapClickListener {
 
     // Marker list
-    private ArrayList<Marker> markers = new ArrayList<>();
+    private final ArrayList<Marker> markers = new ArrayList<>();
+
+    // DBHandler
+    private DBHandler dbHome;
 
     // Search results array, can be referenced from MapsActivity
-    public static ArrayList<DBData> searchResults = new ArrayList<>();
+    private ArrayList<Site> searchResults = new ArrayList<>();
 
+    // Views
     private GoogleMap googleMap;
     private Button signButton;
 
@@ -55,6 +60,8 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         // Initialize signButton
         signButton = findViewById(R.id.signButton);
 
+        dbHome = new DBHandler(this, null, null, 1);
+
         // Initialize Search Bar
         final SearchView searchView = findViewById(R.id.searchBar);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -63,7 +70,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // Search for query
-                updateSearchResults(query);
+                searchResults = dbHome.find(query);
 
                 // For non-empty result lists, update map
                 if (!searchResults.isEmpty()) {
@@ -102,48 +109,34 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
             signButton.setText(R.string.signButtonTextAlt);
     }
 
-    // Compartmentalizes the query process
-    private void updateSearchResults(String term) {
-        // Clear search results
-        searchResults.clear();
-
-        // Construct where clause
-        String whereClause = "";
-
-        // Form query
-        if (!term.isEmpty()) {
-            // If name is provided, start clause
-            whereClause = "(name LIKE \"%" + term + "%\" OR " +
-                    "description LIKE \"%" + term + "%\")";
-        }
-
-        // Pass query to search method
-        DBHandler dbHandler = new DBHandler(this, null, null, 1);
-        searchResults = dbHandler.search(DBHandler.campsitesTable, whereClause);
+    @Override
+    protected void onDestroy() {
+        dbHome.close();
+        super.onDestroy();
     }
 
     private void displayMapResults(){
         ArrayList<LatLng> latLngs = new ArrayList<>();
         LatLngBounds.Builder bounds = null;
 
-        DBData curData = null;
+        Site curSite = null;
         double curLat = 0;
         double curLng = 0;
         double spread = 0;
 
+        markers.clear();
+
         // Loop through results list and add a marker for each site
         for (int i=0; i<searchResults.size(); i++){
 
-            curData = searchResults.get(i);
-            curLat = Double.parseDouble(curData.getData("lat"));
-            curLng = Double.parseDouble(curData.getData("long"));
+            curSite = searchResults.get(i);
 
             // Add lat/long to array list
-            latLngs.add(new LatLng(curLat, curLng));
+            latLngs.add(curSite.getLocation());
 
             // Add marker to list
             markers.add(googleMap.addMarker(new MarkerOptions().position(latLngs.get(i))
-                    .title(curData.getData("name"))));
+                    .title(curSite.getName())));
 
             // Update LatLng Bounds
             if (latLngs.size() > 1){
@@ -173,9 +166,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         googleMap.setOnInfoWindowClickListener(this);
 
         // Check for location permission before enabling myLocation
-        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION )
-                == PackageManager.PERMISSION_GRANTED ) {
-
+        if ( MainActivity.checkPermission(this, MainActivity.LOCATION_REQUEST )) {
             googleMap.setMyLocationEnabled(true);
         }
 
@@ -215,9 +206,9 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
     public void onInfoWindowClick(Marker marker){
         for (int i = 0; i < markers.size(); i++) {
             if (markers.get(i).equals(marker)) {
+                User.getCurrentUser().setCurrentSite(searchResults.get(i));
+
                 Intent intent = new Intent(HomeActivity.this, DisplayCampsiteActivity.class);
-                DisplayCampsiteActivity.currentCampsite =
-                        Long.parseLong(searchResults.get(i).getData("id"));
                 startActivity(intent);
             }
         }

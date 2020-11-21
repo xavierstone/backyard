@@ -6,9 +6,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.xavierstone.backyard.activities.MainActivity;
 import com.xavierstone.backyard.models.Site;
 import com.xavierstone.backyard.models.User;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 /*
@@ -55,11 +58,18 @@ public class DBHandler extends SQLiteOpenHelper {
             "PRIMARY KEY (id), FOREIGN KEY (user_id) REFERENCES users(id), " +
                     "FOREIGN KEY (campsite_id) REFERENCES campsites(id)");
 
+    // Instance variable for context and writable database
+    Context context;
+    SQLiteDatabase db;
+
     // constructor
     public DBHandler(Context context, String name,
                         SQLiteDatabase.CursorFactory factory, int version)
     {
         super(context, DB_NAME + ".db", factory, DB_VER);
+        this.context = context;
+        db = getWritableDatabase();
+        db.close();
     }
 
     @Override
@@ -70,6 +80,68 @@ public class DBHandler extends SQLiteOpenHelper {
         db.execSQL(photosTable.create());
         db.execSQL(ratingsTable.create());
         db.execSQL(favoritesTable.create());
+
+        // Open campsites.txt and load content into a string
+        String text = "";
+        try{
+            InputStream is = context.getAssets().open("campsites.txt");
+
+            // Create byte buffer array
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+
+            // Translate bytes to String
+            text = new String(buffer);
+        }catch (IOException ex){
+            ex.printStackTrace();
+        }
+
+        // Parse text string
+        String c = "";
+        String subStr = "";
+        String[] colNames = DBHandler.campsitesTable.getColNames();
+        String[] data = new String[colNames.length];
+        data[0] = "0";
+        int fieldPos = 1;
+        long dataID = -1;
+        boolean multi = false;
+
+        // Parse file
+        for (int i=0; i < text.length(); i++){
+            c = text.substring(i, i+1);
+
+            if (c.equals("|") || c.equals("`")){
+                if (fieldPos < colNames.length){
+                    data[fieldPos] = subStr;
+                }else{
+                    // Image
+                    if (!multi) {
+                        DBData dbData = new DBData((DBHandler.campsitesTable));
+                        dbData.addData(data);
+                        dataID = db.insert(dbData.getTableName(), null, dbData.getValues());
+                        multi = true;
+                        long rowID = db.insert(dbData.getTableName(), null, dbData.getValues());
+                    }
+
+                    DBData newPhoto = (new DBData(DBHandler.photosTable)).addData(new String[]{"0", ""+dataID, "0", subStr});
+                    db.insert(newPhoto.getTableName(), null, newPhoto.getValues());
+                }
+                subStr = "";
+                fieldPos += 1;
+            }else{
+                subStr += c;
+            }
+
+            if (c.equals("`")){
+                fieldPos = 1;
+                subStr = "";
+                multi = false;
+            }
+        }
+
+        int i =1;
     }
 
     @Override
@@ -80,15 +152,21 @@ public class DBHandler extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    @Override
+    public synchronized void close() {
+        super.close();
+    }
+
     // Inserts a row into the DB
     public long insert(DBData dbData){
-        SQLiteDatabase db = this.getWritableDatabase();
+        db = getWritableDatabase();
 
         long rowID = db.insert(dbData.getTableName(), null, dbData.getValues());
 
+        db.close();
+
         // IDs are generated automatically, so update the ID in the program code
         dbData.setData("id", ""+rowID);
-        db.close();
 
         // ID is also returned for use by other classes
         return rowID;
@@ -99,8 +177,10 @@ public class DBHandler extends SQLiteOpenHelper {
                 " SET "+colName+" = \""+value+"\""+
                 " WHERE id = "+dbData.getData("id");
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        db = getWritableDatabase();
         db.execSQL(query);
+        db.close();
+
         dbData.setData(colName, value);
     }
 
@@ -165,9 +245,8 @@ public class DBHandler extends SQLiteOpenHelper {
             query += ";";
         }
 
-        SQLiteDatabase db = this.getWritableDatabase();
-
         // Create cursor from query
+        db = getReadableDatabase();
         Cursor cursor = db.rawQuery(query, null);
 
         ArrayList<DBData> resultsList = new ArrayList<DBData>();
