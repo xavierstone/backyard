@@ -83,37 +83,61 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
             favButton.setImageBitmap(InternalStorage.loadExternalImage(this, uri.toString()));
         }*/
 
+        // Configure photo display
+        updatePhotoDisplay();
+
+        // Set text fields with data from DB
+        siteName.setText(currentSite.getName());
+        siteSkinny.setText(currentSite.getSkinny());
+    }
+
+    private void updatePhotoDisplay() {
         //Check for read external permission
         boolean storagePermission = MainActivity.checkPermission(this, MainActivity.STORAGE_REQUEST);
 
         int numPhotos = currentSite.getPhotos().size();
 
-        // Modify layout based on photo # and permissions
+        // Modify layout based on file permissions
         if (!storagePermission){
             // Disable upload button, do not load images
-            uploadButton.setEnabled(false);
             displayCampsiteStatus.setText(R.string.noFilePerms);
+            setVisibilities(false, false);
         }else{
-            // If there are any photos to display, do so
-            if (numPhotos > 0) {
-                // Display ImageView and load first photo
-                campsitePhoto.setVisibility(View.VISIBLE);
-                campsitePhoto.setImageBitmap(currentSite.loadCurrentPhoto());
-
-                // Hide status text
-                displayCampsiteStatus.setText("");
-            }
-
-            // If multiple photos, display navigation
-            if (numPhotos > 1){
-                galleryForwardButton.setVisibility(View.VISIBLE);
-                galleryBackButton.setVisibility(View.VISIBLE);
+            // adjust display based on number of photos
+            if (numPhotos == 0){
+                displayCampsiteStatus.setText(R.string.noPicsFound);
+                setVisibilities(false, false);
+            }else if (numPhotos == 1){
+                setVisibilities(true,false);
+            }else{
+                setVisibilities(true,true);
             }
         }
+    }
 
-        // Set text fields with data from DB
-        siteName.setText(currentSite.getName());
-        siteSkinny.setText(currentSite.getSkinny());
+    private void setVisibilities(boolean showPhotoBox, boolean showGallery) {
+        if (showPhotoBox) {
+            campsitePhoto.setVisibility(View.VISIBLE);
+            campsitePhoto.setImageBitmap(currentSite.loadCurrentPhoto());
+
+            // Hide status text
+            displayCampsiteStatus.setVisibility(View.GONE);
+        }else{
+            campsitePhoto.setVisibility(View.GONE);
+
+            // Show status text
+            displayCampsiteStatus.setVisibility(View.VISIBLE);
+
+            // Hide gallery no matter what if photo is hidden
+            showGallery = false;
+        }
+        if (showGallery){
+            galleryForwardButton.setVisibility(View.VISIBLE);
+            galleryBackButton.setVisibility(View.VISIBLE);
+        }else{
+            galleryForwardButton.setVisibility(View.GONE);
+            galleryBackButton.setVisibility(View.GONE);
+        }
     }
 
     private void updateRatings(){
