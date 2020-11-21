@@ -127,7 +127,7 @@ public class DBHandler extends SQLiteOpenHelper {
                 }else{
                     // Image
                     if (!multi) {
-                        DBData dbData = new DBData((DBHandler.campsitesTable));
+                        DBData dbData = new DBData(DBHandler.campsitesTable);
                         dbData.addData(data);
                         dataID = db.insert(dbData.getTableName(), null, dbData.getValues());
                         multi = true;
@@ -237,7 +237,7 @@ public class DBHandler extends SQLiteOpenHelper {
         long parentId = parent.getId();
 
         // Generate where clause
-        String whereClause = "id = \"" + parentId + "\"";
+        String whereClause = "campsite_id = \"" + parentId + "\"";
 
         // Get raw results
         ArrayList<DBData> rawResults = search(photosTable, whereClause);
