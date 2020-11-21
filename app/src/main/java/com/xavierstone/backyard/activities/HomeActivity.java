@@ -11,7 +11,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.RatingBar;
+import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -20,6 +23,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.xavierstone.backyard.R;
 import com.xavierstone.backyard.db.DBHandler;
 import com.xavierstone.backyard.models.Site;
@@ -46,6 +51,10 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
     // Views
     private GoogleMap googleMap;
     private Button signButton;
+
+    // Location
+    Location currentLocation;
+    FusedLocationProviderClient fusedLocationProviderClient;
 
     RatingBar ratingBar;
 
@@ -88,13 +97,44 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
             }
         });
 
+        // Initialize Location Provider
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        if (MainActivity.checkPermission(MainActivity.LOCATION_REQUEST)) {
+            // if location enabled, wait for location check to come through to create map
+            fetchLocation();
+        }else{
+            // Otherwise just DO it!
+            loadMap();
+        }
+
+        //ratingBar = findViewById(R.id.ratingBarHome);
+    }
+
+    // Checks for location, waits on result and calls for a map
+    private void fetchLocation() {
+        if (MainActivity.checkPermission(MainActivity.LOCATION_REQUEST)) {
+            Task<Location> task = fusedLocationProviderClient.getLastLocation();
+            task.addOnSuccessListener(new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    if (location != null) {
+                        currentLocation = location;
+                        Toast.makeText(getApplicationContext(), currentLocation.getLatitude() + "" + currentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                    }
+
+                    // Load the Google Map Fragment
+                    loadMap();
+                }
+            });
+        }
+    }
+
+    private void loadMap() {
         // Load the Google Map Fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.googleMapsFrag);
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
-
-        //ratingBar = findViewById(R.id.ratingBarHome);
     }
 
     @Override
@@ -171,11 +211,6 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bounds.build().getCenter(), zoom));
         googleMap.setOnInfoWindowClickListener(this);
 
-        // Check for location permission before enabling myLocation
-        if ( MainActivity.checkPermission(MainActivity.LOCATION_REQUEST )) {
-            googleMap.setMyLocationEnabled(true);
-        }
-
         // Hide that pesky keyboard
         hideKeyboard();
     }
@@ -188,6 +223,19 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
 
         // Enable map click listener
         googleMap.setOnMapClickListener(this);
+
+        // If location permission available
+        if (MainActivity.checkPermission(MainActivity.LOCATION_REQUEST)) {
+            // Center on current location
+            LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+            //MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("I am here!");
+            //googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+            //googleMap.addMarker(markerOptions);
+
+            // Enable location
+            googleMap.setMyLocationEnabled(true);
+        }
     }
 
     @Override
