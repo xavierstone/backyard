@@ -28,7 +28,10 @@ As well as: name, photos, description, and ratings
  */
 public class DisplayCampsiteActivity extends AppCompatActivity {
 
-    // Text Fields
+    // DB Handler
+    private DBHandler dbSite;
+
+    // Views
     TextView siteName;
     TextView siteDescription;
     TextView displayCampsiteStatus;
@@ -64,8 +67,8 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         favButton = findViewById(R.id.favButton);
 
         // Search database for current campsite (ID will have been passed by previous activity)
-        DBHandler dbHandler = new DBHandler(this,null,null,1);
-        DBData currentSite = dbHandler.search(DBHandler.campsitesTable, "id", ""+currentCampsite).get(0);
+        dbSite = new DBHandler(this,null,null,1);
+        DBData currentSite = dbSite.search(DBHandler.campsitesTable, "id", ""+currentCampsite).get(0);
 
         // Get rating
         updateRatings();
@@ -85,7 +88,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
                 android.Manifest.permission.READ_EXTERNAL_STORAGE ) == PackageManager.PERMISSION_GRANTED );
 
         // Search DB for campsite photos
-        photos = dbHandler.search(DBHandler.photosTable,"campsite_id",""+currentCampsite);
+        photos = dbSite.search(DBHandler.photosTable,"campsite_id",""+currentCampsite);
 
         // Modify layout based on photo # and permissions
         if (!permission){
@@ -121,8 +124,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
     }
 
     private void updateRatings(){
-        DBHandler dbHandler = new DBHandler(this, null, null, 1);
-        ArrayList<DBData> ratings = dbHandler.search(DBHandler.ratingsTable, "campsite_id", ""+currentCampsite);
+        ArrayList<DBData> ratings = dbSite.search(DBHandler.ratingsTable, "campsite_id", ""+currentCampsite);
         double totalRating = 0;
         for (int i = 0; i < ratings.size(); i++){
             totalRating+=Double.parseDouble(ratings.get(i).getData("stars"));
@@ -254,5 +256,11 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
     public void goToSearchOptions(View view){
         Intent intent = new Intent(DisplayCampsiteActivity.this, SearchOptionsActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        dbSite.close();
+        super.onDestroy();
     }
 }
