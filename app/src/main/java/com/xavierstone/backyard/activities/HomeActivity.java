@@ -1,13 +1,11 @@
 package com.xavierstone.backyard.activities;
 
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.widget.Button;
 import android.widget.SearchView;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
@@ -23,7 +21,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.xavierstone.backyard.R;
-import com.xavierstone.backyard.db.DBData;
 import com.xavierstone.backyard.db.DBHandler;
 import com.xavierstone.backyard.models.Site;
 import com.xavierstone.backyard.models.User;
@@ -74,7 +71,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
 
                 // For non-empty result lists, update map
                 if (!searchResults.isEmpty()) {
-                    displayMapResults();
+                    updateMapResults();
                 }
 
                 // Clear query
@@ -115,16 +112,19 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         super.onDestroy();
     }
 
-    private void displayMapResults(){
+    private void updateMapResults(){
+        // Clear all markers from map
+        for (Marker marker : markers)
+            marker.remove();
+        markers.clear();
+
+        // Initialize Camera Bound Guide
         ArrayList<LatLng> latLngs = new ArrayList<>();
         LatLngBounds.Builder bounds = null;
-
         Site curSite = null;
         double curLat = 0;
         double curLng = 0;
         double spread = 0;
-
-        markers.clear();
 
         // Loop through results list and add a marker for each site
         for (int i=0; i<searchResults.size(); i++){
@@ -153,13 +153,15 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
             Location centerLoc = new Location("");
             centerLoc.setLatitude(bounds.build().getCenter().latitude);
             centerLoc.setLongitude(bounds.build().getCenter().longitude);
-
             double curSpread = curLoc.distanceTo(centerLoc);
-
             if (curSpread>spread) spread = curSpread;
         }
 
-        int zoom = (int) (14 - Math.floor(Math.log10(spread/500)/Math.log10(2)));
+        // Calculate zoom level
+        // Zoom limits for Google Camera
+        int MAX_ZOOM = 14;
+        int zoom = (int) (MAX_ZOOM - Math.floor(Math.log10(spread/500)/Math.log10(2)));
+        if (zoom > MAX_ZOOM) zoom = MAX_ZOOM;
 
         assert bounds != null;
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bounds.build().getCenter(), zoom));

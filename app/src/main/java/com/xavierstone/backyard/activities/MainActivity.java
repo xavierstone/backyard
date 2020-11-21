@@ -29,8 +29,6 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             android.Manifest.permission.ACCESS_FINE_LOCATION};
     private final String[] storageRequest = new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE};
 
-    //private CallbackManager callbackManager = CallbackManager.Factory.create();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
