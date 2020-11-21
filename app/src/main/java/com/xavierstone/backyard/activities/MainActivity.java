@@ -19,7 +19,7 @@ import com.xavierstone.backyard.models.User;
 Page the app opens to, asks permissions
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     // Permission managment
     public static int LOCATION_REQUEST=0;
@@ -41,41 +41,54 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        // Check for permissions, global variable used in onRequestPermissionsResult
-        checkPermissions();
+        // Check for location permission
+        if (!checkPermission(this, LOCATION_REQUEST)) {
+            // Not enabled, request location permission
+            ActivityCompat.requestPermissions(this, locationRequest, LOCATION_REQUEST);
+        }else{
+            // Yes enabled! Check for storage permission
+            if (!checkPermission(this, STORAGE_REQUEST)) {
+                // Nope, request it
+                ActivityCompat.requestPermissions(this, storageRequest, STORAGE_REQUEST);
+            }else{
+                // Yay!!! Both permissions! Let's go!
+                permissionsResult();
+            }
+        }
 
+        // Rest of code is in permission result functions
+    }
+
+    // This function waits for a result from the permission request
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
+        // Check for requestCode
+        if (requestCode == LOCATION_REQUEST){
+            // Location was requested; Check to see if storage was granted
+            if (checkPermission(this, STORAGE_REQUEST)){
+                // Yes!!! Finish this off
+                permissionsResult();
+            }else{
+                // Nope, ask for it
+                ActivityCompat.requestPermissions(this, storageRequest, STORAGE_REQUEST);
+            }
+        }else if (requestCode == STORAGE_REQUEST){
+            // Storage was requested
+            // Location must have at least been asked in order to get here,
+            // so it doesn't matter what they said, we'll take it and go on
+            permissionsResult();
+        }
+    }
+
+    // This function is the final result of the permissions labyrinth
+    // Checks off the final I's and goes to the HomeActivity
+    public void permissionsResult() {
         // Initialize test user
         User.signIn("test@test.com","test");
 
-        // Go to Home
-        goToHome();
-    }
-
-    private void checkPermissions(){
-        // Determine Initial Permission to request
-        // Request is processed in onRequestPermissionsResult,
-        // then second permission is requested if applicable
-
-        // If location permission
-        if (checkPermission(this, LOCATION_REQUEST)) {
-            // Check storage permission
-            if (!checkPermission(this, STORAGE_REQUEST)) {
-                // If not, request storage permission
-                ActivityCompat.requestPermissions(this, storageRequest, STORAGE_REQUEST);
-            }
-        }else {
-            // Otherwise, request location permission
-            ActivityCompat.requestPermissions(this, locationRequest, LOCATION_REQUEST);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
-        // Request storage after Location request has resulted
-        if (requestCode == LOCATION_REQUEST){
-            // Request storage
-            ActivityCompat.requestPermissions(this, storageRequest, STORAGE_REQUEST);
-        }
+        // Transfer control to Home Activity
+        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+        startActivity(intent);
     }
 
     public static boolean checkPermission(Activity context, int permissionID) {
@@ -101,31 +114,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return permGranted;
-    }
-
-    /*@Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        callbackManager.onActivityResult(requestCode, resultCode, data);
-        super.onActivityResult(requestCode, resultCode, data);
-    }*/
-
-    public void goToHome() {
-        // God mode is hardcoded
-        /*ArrayList<DBData> user = dbHandler.search(DBHandler.usersTable,
-                    "email", "xaviermstone@gmail.com");
-
-        if (user.isEmpty()) {
-            DBData xavier = new DBData(DBHandler.usersTable);
-            xavier.addData(new String[]{"0", "Xavier", "Stone", ""+DBHandler.LOCAL_ACCOUNT, "xaviermstone@gmail.com"});
-            userID = (int) dbHandler.insert(xavier);
-            InternalStorage.saveCredentials(this, "xaviermstone@gmail.com,Qwakmagic45\n");
-        } else {
-            userID = Integer.parseInt(user.get(0).getData("id"));
-        }*/
-
-        // Transfer control to Home Activity
-        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-        startActivity(intent);
     }
 
     /*
