@@ -172,7 +172,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         googleMap.setOnInfoWindowClickListener(this);
 
         // Check for location permission before enabling myLocation
-        if ( MainActivity.checkPermission(this, MainActivity.LOCATION_REQUEST )) {
+        if ( MainActivity.checkPermission(MainActivity.LOCATION_REQUEST )) {
             googleMap.setMyLocationEnabled(true);
         }
 

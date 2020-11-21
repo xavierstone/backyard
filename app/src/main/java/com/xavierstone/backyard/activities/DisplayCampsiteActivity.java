@@ -3,8 +3,6 @@ package com.xavierstone.backyard.activities;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -13,11 +11,9 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.xavierstone.backyard.db.InternalStorage;
 import com.xavierstone.backyard.R;
 import com.xavierstone.backyard.db.DBData;
 import com.xavierstone.backyard.db.DBHandler;
-import com.xavierstone.backyard.models.Photo;
 import com.xavierstone.backyard.models.Site;
 import com.xavierstone.backyard.models.User;
 
@@ -37,7 +33,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
     TextView siteName;
     TextView siteSkinny;
     TextView displayCampsiteStatus;
-    ImageView campsitePhoto;
+    ImageView currentPic;
     ImageButton galleryBackButton;
     ImageButton galleryForwardButton;
     Button uploadButton;
@@ -61,7 +57,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         // Load text fields
         siteName = findViewById(R.id.siteName);
         siteSkinny = findViewById(R.id.siteDescription);
-        campsitePhoto = findViewById(R.id.campsitePhoto);
+        currentPic = findViewById(R.id.currentPic);
         galleryBackButton = findViewById(R.id.galleryBackButton);
         galleryForwardButton = findViewById(R.id.galleryForwardButton);
         uploadButton = findViewById(R.id.uploadButton);
@@ -84,18 +80,18 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         }*/
 
         // Configure photo display
-        updatePhotoDisplay();
+        updatePicDisplay();
 
         // Set text fields with data from DB
         siteName.setText(currentSite.getName());
         siteSkinny.setText(currentSite.getSkinny());
     }
 
-    private void updatePhotoDisplay() {
+    private void updatePicDisplay() {
         //Check for read external permission
-        boolean storagePermission = MainActivity.checkPermission(this, MainActivity.STORAGE_REQUEST);
+        boolean storagePermission = MainActivity.checkPermission(MainActivity.STORAGE_REQUEST);
 
-        int numPhotos = currentSite.getPhotos().size();
+        int numPics = currentSite.getPics().size();
 
         // Modify layout based on file permissions
         if (!storagePermission){
@@ -104,10 +100,10 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
             setVisibilities(false, false);
         }else{
             // adjust display based on number of photos
-            if (numPhotos == 0){
+            if (numPics == 0){
                 displayCampsiteStatus.setText(R.string.noPicsFound);
                 setVisibilities(false, false);
-            }else if (numPhotos == 1){
+            }else if (numPics == 1){
                 setVisibilities(true,false);
             }else{
                 setVisibilities(true,true);
@@ -115,15 +111,15 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         }
     }
 
-    private void setVisibilities(boolean showPhotoBox, boolean showGallery) {
-        if (showPhotoBox) {
-            campsitePhoto.setVisibility(View.VISIBLE);
-            campsitePhoto.setImageBitmap(currentSite.loadCurrentPhoto());
+    private void setVisibilities(boolean showCurrentPic, boolean showGallery) {
+        if (showCurrentPic) {
+            currentPic.setVisibility(View.VISIBLE);
+            currentPic.setImageBitmap(currentSite.getCurrentPic());
 
             // Hide status text
             displayCampsiteStatus.setVisibility(View.GONE);
         }else{
-            campsitePhoto.setVisibility(View.GONE);
+            currentPic.setVisibility(View.GONE);
 
             // Show status text
             displayCampsiteStatus.setVisibility(View.VISIBLE);
@@ -179,18 +175,18 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
     // Gallery Navigation
     public void galleryBack(View view){
         // Decrement photo
-        currentSite.adjustCurrentPhoto(-1);
+        currentSite.scrollGallery(-1);
 
         // Load photo
-        campsitePhoto.setImageBitmap(currentSite.loadCurrentPhoto());
+        currentPic.setImageBitmap(currentSite.getCurrentPic());
     }
 
     public void galleryForward(View view){
         // Increment photo
-        currentSite.adjustCurrentPhoto(-1);
+        currentSite.scrollGallery(-1);
 
         // Load photo
-        campsitePhoto.setImageBitmap(currentSite.loadCurrentPhoto());
+        currentPic.setImageBitmap(currentSite.getCurrentPic());
     }
 
     // Adds a rating

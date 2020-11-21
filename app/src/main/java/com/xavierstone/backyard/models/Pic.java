@@ -11,7 +11,7 @@ import com.xavierstone.backyard.activities.MainActivity;
 import java.io.FileNotFoundException;
 
 // Represents a photo, must be associated with a user and a campsite
-public class Photo {
+public class Pic {
     // String literals
     private static final String resourcePrefix = "android.resource://";
     private static final String drawableDirectory = "/drawable/";
@@ -26,7 +26,7 @@ public class Photo {
     private final User author;
     private final Site site;
 
-    public Photo(User author, Site site, long id, String filename) {
+    public Pic(User author, Site site, long id, String filename) {
         // Copy arguments
         this.author = author;
         this.site = site;
@@ -37,14 +37,22 @@ public class Photo {
     // Load from internal storage
     // Returns bitmap
     public Bitmap loadImage(){
+        // Construct filepath from components
         String filepath = resourcePrefix + MainActivity.PACKAGE_NAME + drawableDirectory + filename;
 
+        // Parse into Uri
         Uri targetUri = Uri.parse(filepath);
+
+        // Try opening bitmap
         Bitmap bitmap;
         try {
             bitmap = BitmapFactory.decodeStream(MainActivity.currentActivity.getContentResolver().openInputStream(targetUri));
+
+            // Return if successful
             return bitmap;
         } catch (FileNotFoundException e) {
+            // Otherwise print error
+            // TODO: handle 'no Bitmap found' gracefully
             e.printStackTrace();
             return null;
         }

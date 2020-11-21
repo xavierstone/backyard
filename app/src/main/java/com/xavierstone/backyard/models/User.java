@@ -1,9 +1,6 @@
 package com.xavierstone.backyard.models;
 
-import android.app.Activity;
-
 import com.google.android.gms.maps.model.LatLng;
-import com.xavierstone.backyard.db.DBHandler;
 
 import java.util.ArrayList;
 
@@ -22,7 +19,7 @@ public class User {
     private final ArrayList<Site> faves; // favorite sites
     private final ArrayList<Rant> rants; // reviews
     private final ArrayList<Site> createdSites;
-    private final ArrayList<Photo> createdPhotos;
+    private final ArrayList<Pic> createdPics;
 
     // Marker for site the user is currently viewing/interacting with
     private Site currentSite;
@@ -38,7 +35,7 @@ public class User {
         faves = new ArrayList<>();
         rants = new ArrayList<>();
         createdSites = new ArrayList<>();
-        createdPhotos = new ArrayList<>();
+        createdPics = new ArrayList<>();
     }
 
     // Static getUser method
@@ -69,7 +66,7 @@ public class User {
     public ArrayList<Site> getFaves() { return faves; }
     public ArrayList<Rant> getRants() { return rants; }
     public ArrayList<Site> getCreatedSites() { return createdSites; }
-    public ArrayList<Photo> getCreatedPhotos() { return createdPhotos; }
+    public ArrayList<Pic> getCreatedPics() { return createdPics; }
 
     // Sign In
     // TODO: correctly implement sign in
@@ -101,11 +98,11 @@ public class User {
         return newRant;
     }
 
-    // Add a photo to the current site
-    public Photo addPhoto(String uri) {
-        Photo newPhoto = new Photo(this, currentSite, id, uri);     // create photo
-        currentSite.registerPhoto(newPhoto);                    // register with campsite
-        return newPhoto;
+    // Add a pic to the current site
+    public Pic addPic(String uri) {
+        Pic newPic = new Pic(this, currentSite, id, uri);     // create pic
+        currentSite.registerPic(newPic);                    // register with campsite
+        return newPic;
     }
 
     // Update site methods

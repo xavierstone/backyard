@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.xavierstone.backyard.activities.MainActivity;
-import com.xavierstone.backyard.models.Photo;
+import com.xavierstone.backyard.models.Pic;
 import com.xavierstone.backyard.models.Site;
 import com.xavierstone.backyard.models.User;
 
@@ -231,8 +231,8 @@ public class DBHandler extends SQLiteOpenHelper {
 
     // Find photos based on the parent campsite
     // Returns true if at least one photo was loaded
-    public boolean loadSitePhotos(Site parent) {
-        ArrayList<Photo> results = new ArrayList<>();
+    public void loadSitePics(Site parent) {
+        ArrayList<Pic> results = new ArrayList<>();
 
         long parentId = parent.getId();
 
@@ -250,10 +250,8 @@ public class DBHandler extends SQLiteOpenHelper {
 
             // Add new Site object
             // TODO: have the author reflect the author, currently not stored
-            parent.registerPhoto(new Photo(User.getCurrentUser(), parent, id, filename));
+            parent.registerPic(new Pic(User.getCurrentUser(), parent, id, filename));
         }
-
-        return !parent.getPhotos().isEmpty();
     }
 
     // Searches for a single query in any column. Only exact matches can be used, no inequalities

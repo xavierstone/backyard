@@ -49,12 +49,12 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         super.onStart();
 
         // Check for location permission
-        if (!checkPermission(this, LOCATION_REQUEST)) {
+        if (!checkPermission(LOCATION_REQUEST)) {
             // Not enabled, request location permission
             ActivityCompat.requestPermissions(this, locationRequest, LOCATION_REQUEST);
         }else{
             // Yes enabled! Check for storage permission
-            if (!checkPermission(this, STORAGE_REQUEST)) {
+            if (!checkPermission(STORAGE_REQUEST)) {
                 // Nope, request it
                 ActivityCompat.requestPermissions(this, storageRequest, STORAGE_REQUEST);
             }else{
@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         // Check for requestCode
         if (requestCode == LOCATION_REQUEST){
             // Location was requested; Check to see if storage was granted
-            if (checkPermission(this, STORAGE_REQUEST)){
+            if (checkPermission(STORAGE_REQUEST)){
                 // Yes!!! Finish this off
                 permissionsResult();
             }else{
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         startActivity(intent);
     }
 
-    public static boolean checkPermission(Activity context, int permissionID) {
+    public static boolean checkPermission(int permissionID) {
         int approved = PackageManager.PERMISSION_GRANTED;
         boolean permGranted = false;
 
@@ -109,15 +109,15 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             String fineLocPerm = Manifest.permission.ACCESS_FINE_LOCATION;
 
             // Check permission
-            permGranted = ( ContextCompat.checkSelfPermission(context, coarseLocPerm) == approved
-                    &&  ContextCompat.checkSelfPermission(context, fineLocPerm) == approved);
+            permGranted = ( ContextCompat.checkSelfPermission(MainActivity.currentActivity, coarseLocPerm) == approved
+                    &&  ContextCompat.checkSelfPermission(MainActivity.currentActivity, fineLocPerm) == approved);
 
         }else if (permissionID == STORAGE_REQUEST) { // If permission ID is storage request
             // Get permission string
             String storagePerm = Manifest.permission.READ_EXTERNAL_STORAGE;
 
             // Check permission
-            permGranted = ( ContextCompat.checkSelfPermission(context, storagePerm) == approved );
+            permGranted = ( ContextCompat.checkSelfPermission(MainActivity.currentActivity, storagePerm) == approved );
         }
 
         return permGranted;

@@ -67,7 +67,7 @@
             app:srcCompat="@android:drawable/ic_media_play" />
 
         <ImageView
-            android:id="@+id/campsitePhoto"
+            android:id="@+id/currentPic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
@@ -90,7 +90,7 @@
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/campsitePhoto"
+            app:layout_constraintTop_toTopOf="@+id/currentPic"
             app:srcCompat="@android:drawable/ic_media_play" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -163,7 +163,7 @@
             android:layout_height="wrap_content"
             android:enabled="false"
             android:onClick="uploadPhoto"
-            android:text="Upload a Photo"
+            android:text="New Pic"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/favButton"
             app:layout_constraintTop_toTopOf="@+id/favButton" />

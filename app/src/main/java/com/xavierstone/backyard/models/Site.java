@@ -1,10 +1,8 @@
 package com.xavierstone.backyard.models;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.xavierstone.backyard.activities.MainActivity;
 import com.xavierstone.backyard.db.DBHandler;
 
 import java.util.ArrayList;
@@ -18,11 +16,11 @@ public class Site {
     private String skinny; // site description
 
     // Current Photo tracker
-    private int currentPhoto;
+    private int currentPic;
 
     // References
     private final User author;
-    private final ArrayList<Photo> photos; // site photos in order to be displayed
+    private final ArrayList<Pic> pics; // site photos in order to be displayed
     private final ArrayList<Rant> rants; // site reviews
 
     // Constructor should be called before adding any photos or reviews
@@ -34,10 +32,10 @@ public class Site {
         this.location = location;
         this.skinny = skinny;
 
-        this.currentPhoto = 0;
+        this.currentPic = 0;
 
         // Initialize ArrayLists
-        photos = new ArrayList<>();
+        pics = new ArrayList<>();
         rants = new ArrayList<>();
     }
 
@@ -47,7 +45,7 @@ public class Site {
     public String getName() { return name; }
     public LatLng getLocation() { return location; }
     public String getSkinny() { return skinny; }
-    public ArrayList<Photo> getPhotos() { return photos; }
+    public ArrayList<Pic> getPics() { return pics; }
     public ArrayList<Rant> getRants() { return rants; }
 
     // Get star rating
@@ -79,29 +77,29 @@ public class Site {
 
         // Load photos from DB
         DBHandler dbHandler = new DBHandler();
-        dbHandler.loadSitePhotos(this);
+        dbHandler.loadSitePics(this);
     }
 
     // Get current photo
-    public Bitmap loadCurrentPhoto() {
-        if (photos.isEmpty())
+    public Bitmap getCurrentPic() {
+        if (pics.isEmpty())
             return null;
 
-        return photos.get(currentPhoto).loadImage();
+        return pics.get(currentPic).loadImage();
     }
 
     // Moves the current photo by an increment, only designed for 1 or -1
-    public void adjustCurrentPhoto(int increment) {
+    public void scrollGallery(int increment) {
         if (Math.abs(increment) == 1) {
-            currentPhoto += increment;
+            currentPic += increment;
 
             // Wrap around photos array
-            if (currentPhoto < 0) currentPhoto = photos.size() - 1;
-            if (currentPhoto >= photos.size()) currentPhoto = 0;
+            if (currentPic < 0) currentPic = pics.size() - 1;
+            if (currentPic >= pics.size()) currentPic = 0;
         }
     }
 
     // Registers
-    public void registerPhoto(Photo photo) { photos.add(photo); }
+    public void registerPic(Pic pic) { pics.add(pic); }
     public void registerRant(Rant rant) { rants.add(rant); }
 }
