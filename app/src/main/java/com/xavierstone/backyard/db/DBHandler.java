@@ -122,7 +122,6 @@ public class DBHandler extends SQLiteOpenHelper {
                         dbData.addData(data);
                         dataID = db.insert(dbData.getTableName(), null, dbData.getValues());
                         multi = true;
-                        long rowID = db.insert(dbData.getTableName(), null, dbData.getValues());
                     }
 
                     DBData newPhoto = (new DBData(DBHandler.photosTable)).addData(new String[]{"0", ""+dataID, "0", subStr});
