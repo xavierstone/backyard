@@ -69,7 +69,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // Search for query
-                searchResults = dbHome.find(query);
+                searchResults = dbHome.findSites(query);
 
                 // For non-empty result lists, update map
                 if (!searchResults.isEmpty()) {
