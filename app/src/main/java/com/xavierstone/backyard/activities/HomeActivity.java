@@ -60,6 +60,8 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         // Initialize signButton
         signButton = findViewById(R.id.signButton);
 
+        dbHome = new DBHandler(this, null, null, 1);
+
         // Initialize Search Bar
         final SearchView searchView = findViewById(R.id.searchBar);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -100,9 +102,6 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
     protected void onResume() {
         super.onResume();
 
-        // Open database
-        dbHome = new DBHandler(this, null, null, 1);
-
         // Set text of Sign In Button to reflect sign in status
         if (User.getCurrentUser() == null)
             signButton.setText(R.string.signButtonText);
@@ -111,10 +110,9 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-
-        dbHome.close();;
+    protected void onDestroy() {
+        dbHome.close();
+        super.onDestroy();
     }
 
     private void displayMapResults(){
