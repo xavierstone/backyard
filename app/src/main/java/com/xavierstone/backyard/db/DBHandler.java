@@ -5,6 +5,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.xavierstone.backyard.models.Site;
+import com.xavierstone.backyard.models.User;
+
 import java.util.ArrayList;
 
 /*
@@ -98,6 +102,42 @@ public class DBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL(query);
         dbData.setData(colName, value);
+    }
+
+    // Find methods
+    // TODO: create find methods as needed
+
+    // Find based on "term", only implemented for Site
+    // Returns no results with an empty term
+    public ArrayList<Site> find(String term) {
+        ArrayList<Site> results = new ArrayList<Site>();
+        // Check if term is empty, return empty list
+        if (term.equals(""))
+            return results;
+
+        // Otherwise, generate where clause
+        String whereClause = "(name LIKE \"%" + term + "%\" OR " +
+                "description LIKE \"%" + term + "%\")";
+
+        // Get raw results
+        ArrayList<DBData> rawResults = search(campsitesTable, whereClause);
+
+        // Iteratively translate results
+        for (DBData rawResult : rawResults){
+            // Parse attributes
+            String name = rawResult.getData("name");
+            double lat = Double.parseDouble(rawResult.getData("lat"));
+            double lng = Double.parseDouble(rawResult.getData("long"));
+            String skinny = rawResult.getData("description");
+
+            // Bundle lat/long
+            LatLng location = new LatLng(lat, lng);
+
+            // Add new Site object
+            results.add(new Site(User.getCurrentUser(), name, location, skinny));
+        }
+
+        return results;
     }
 
     // Searches for a single query in any column. Only exact matches can be used, no inequalities
