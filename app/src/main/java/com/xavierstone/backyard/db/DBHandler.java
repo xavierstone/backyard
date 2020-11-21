@@ -16,7 +16,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     // database name and version
     private static final int DB_VER = 1;
-    private static final String DB_NAME = "CampsiteLocator.db";
+    private static final String DB_NAME = "Backyard";
 
     // user account types
     public static final int LOCAL_ACCOUNT = 0;
@@ -55,7 +55,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public DBHandler(Context context, String name,
                         SQLiteDatabase.CursorFactory factory, int version)
     {
-        super(context, DB_NAME, factory, DB_VER);
+        super(context, DB_NAME + ".db", factory, DB_VER);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class DBHandler extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
         // Upgrade method
-        String query = "DROP TABLE IF EXISTS CampsiteLocator;";
+        String query = "DROP TABLE IF EXISTS "+DB_NAME+";";
         db.execSQL(query);
         onCreate(db);
     }
