@@ -197,7 +197,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     // Find based on "term", only implemented for Site
     // Returns no results with an empty term
-    public ArrayList<Site> find(String term) {
+    public ArrayList<Site> findSites(String term) {
         ArrayList<Site> results = new ArrayList<Site>();
         // Check if term is empty, return empty list
         if (term.equals(""))
