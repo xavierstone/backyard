@@ -4,6 +4,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.view.Gravity;
 import android.widget.Button;
 import android.widget.SearchView;
 import android.location.Location;
@@ -83,6 +84,12 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
                 // For non-empty result lists, update map
                 if (!searchResults.isEmpty()) {
                     updateMapResults();
+                }else{
+                    // Otherwise, make a quick toast
+                    Toast noResults = Toast.makeText(HomeActivity.this,"No Sites Found",Toast.LENGTH_LONG);
+                    hideKeyboard();
+                    noResults.setGravity(Gravity.CENTER, 0, 0);
+                    noResults.show();
                 }
 
                 // Clear query
@@ -117,10 +124,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
             task.addOnSuccessListener(new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
-                    if (location != null) {
-                        currentLocation = location;
-                        Toast.makeText(getApplicationContext(), currentLocation.getLatitude() + "" + currentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
-                    }
+                    if (location != null) currentLocation = location;
 
                     // Load the Google Map Fragment
                     loadMap();
