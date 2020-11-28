@@ -3,13 +3,16 @@ package com.xavierstone.backyard.activities;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.xavierstone.backyard.R;
 import com.xavierstone.backyard.db.DBData;
@@ -26,8 +29,8 @@ As well as: name, photos, description, and ratings
 public class DisplayCampsiteActivity extends AppCompatActivity {
 
     // DB Handler
-    private DBHandler dbSite;
     private Site currentSite;
+    private boolean picsLoaded = false;
 
     // Views
     TextView siteName;
@@ -48,11 +51,11 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
 
         MainActivity.currentActivity = this;
 
-        // Initialize DB
-        dbSite = new DBHandler();
-
         // Get current!
         currentSite = User.getCurrentUser().getCurrentSite();
+
+        // Start picsloader
+        new loadPics().execute();
 
         // Load text fields
         siteName = findViewById(R.id.siteName);
@@ -87,7 +90,14 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         siteSkinny.setText(currentSite.getSkinny());
     }
 
-    private void updatePicDisplay() {
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+    }
+
+    protected void updatePicDisplay() {
         //Check for read external permission
         boolean storagePermission = MainActivity.checkPermission(MainActivity.STORAGE_REQUEST);
 
@@ -99,14 +109,16 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
             displayCampsiteStatus.setText(R.string.noFilePerms);
             setVisibilities(false, false);
         }else{
-            // adjust display based on number of photos
-            if (numPics == 0){
-                displayCampsiteStatus.setText(R.string.noPicsFound);
+            // Check for pics load
+            if (!picsLoaded){
+                displayCampsiteStatus.setText(R.string.picsLoading);
                 setVisibilities(false, false);
-            }else if (numPics == 1){
-                setVisibilities(true,false);
-            }else{
-                setVisibilities(true,true);
+            }else {
+                // adjust display based on number of photos
+                if (numPics == 0) {
+                    displayCampsiteStatus.setText(R.string.noPicsFound);
+                    setVisibilities(false, false);
+                } else setVisibilities(true, numPics != 1);
             }
         }
     }
@@ -136,14 +148,14 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         }
     }
 
-    private void updateRatings(){
+    private void updateRatings(){/*
         ArrayList<DBData> ratings = dbSite.search(DBHandler.ratingsTable, "campsite_id", ""+ currentSite);
         double totalRating = 0;
         for (int i = 0; i < ratings.size(); i++){
             totalRating+=Double.parseDouble(ratings.get(i).getData("stars"));
         }
         totalRating/=ratings.size();
-        ratingBar.setRating((float)totalRating);
+        ratingBar.setRating((float)totalRating);*/
     }
 
     /*
@@ -260,9 +272,24 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         }*/
     }
 
+    private class loadPics extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            MainActivity.dbHandler.loadSitePics(currentSite);
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            picsLoaded = true;
+            updatePicDisplay();
+
+            super.onPostExecute(aVoid);
+        }
+    }
+
     @Override
     protected void onDestroy() {
-        dbSite.close();
+        //dbSite.close();
         super.onDestroy();
     }
 }

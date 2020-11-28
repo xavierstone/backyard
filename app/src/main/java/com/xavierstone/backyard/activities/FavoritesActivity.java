@@ -1,4 +1,4 @@
-package com.xavierstone.backyard.activities;
+/*package com.xavierstone.backyard.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,7 +11,7 @@ import com.xavierstone.backyard.R;
 
 /*
 Lists favorite campsites for the current user
- */
+
 
 public class FavoritesActivity extends AppCompatActivity {
 
@@ -49,7 +49,7 @@ public class FavoritesActivity extends AppCompatActivity {
             resultString = "No results.";
         }
 
-        favoriteResultsView.setText(resultString);*/
+        favoriteResultsView.setText(resultString);
     }
 
     // Goes to home screen
@@ -64,3 +64,4 @@ public class FavoritesActivity extends AppCompatActivity {
         startActivity(intent);
     }
 }
+*/

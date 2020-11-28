@@ -10,7 +10,7 @@ public class User {
     private static User currentUser;
 
     // Attributes
-    private long id; // SQLite ID
+    private String id; // SQLite ID
     private String name; // single field for first name, last name, nickname etc.
     private String email; // email address
     private String password; // plain text password
@@ -24,7 +24,7 @@ public class User {
     // Marker for site the user is currently viewing/interacting with
     private Site currentSite;
 
-    public User(long id, String name, String email, String password){
+    public User(String id, String name, String email, String password){
         // create user with specified attributes
         this.id = id;
         this.name = name;
@@ -56,7 +56,7 @@ public class User {
     public void addFave(Site site) { faves.add(site); }
 
     // Getters
-    public long getId() { return id; }
+    public String getId() { return id; }
     public String getName() { return name; }
     public String getEmail() { return email; }
     public String getPassword() { return password; }
@@ -72,7 +72,7 @@ public class User {
     // TODO: correctly implement sign in
     public static User signIn(String email, String password) {
         if (currentUser == null)
-            currentUser = new User(0,"test", email, password);
+            currentUser = new User("0","test", email, password);
 
         return currentUser;
     }
@@ -87,7 +87,7 @@ public class User {
     // Need updating to properly handle ID field with database
 
     // Create a campsite
-    public Site createCampsite(long id, String name, LatLng location, String skinny){
+    public Site createCampsite(String id, String name, LatLng location, String skinny){
         return new Site(this, id, name, location, skinny);
     }
 

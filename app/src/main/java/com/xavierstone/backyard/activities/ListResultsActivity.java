@@ -1,4 +1,4 @@
-package com.xavierstone.backyard.activities;
+/*package com.xavierstone.backyard.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -35,3 +35,4 @@ public class ListResultsActivity extends AppCompatActivity {
         recyclerView.setAdapter(mAdapter);
     }
 }
+*/

@@ -32,4 +32,5 @@
     <string name="noSiteName">The Site that Can Be Named<br/>is Not the True Site</string>
     <string name="noPicsFound">"Nobody was wearing clothes so we couldn't post any pictures."</string>
     <string name="noSiteSkinny">The idiot who posted this was illiterate,<br/>so this is all you get.</string>
+    <string name="picsLoading">Pics Loading, Be Patient</string>
 </resources>

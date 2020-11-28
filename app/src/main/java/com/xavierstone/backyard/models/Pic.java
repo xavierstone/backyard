@@ -17,7 +17,7 @@ public class Pic {
     private static final String drawableDirectory = "/drawable/";
 
     // ID
-    private long id;
+    private String id;
 
     // URI for internal storage
     private String filename;
@@ -26,7 +26,7 @@ public class Pic {
     private final User author;
     private final Site site;
 
-    public Pic(User author, Site site, long id, String filename) {
+    public Pic(User author, Site site, String id, String filename) {
         // Copy arguments
         this.author = author;
         this.site = site;

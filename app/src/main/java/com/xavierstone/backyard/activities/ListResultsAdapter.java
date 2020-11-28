@@ -1,3 +1,4 @@
+/*
 package com.xavierstone.backyard.activities;
 
 import android.content.Context;
@@ -70,9 +71,10 @@ public class ListResultsAdapter extends RecyclerView.Adapter<ListResultsAdapter.
         DBData curSite = searchResults.get(position);
         holder.name.setText(curSite.getData("name"));
 
+
         // Load photos
-        DBHandler dbHandler = new DBHandler(context, null, null,1);
-        ArrayList<DBData> photos = dbHandler.search(DBHandler.photosTable,
+        //DBHandler dbHandler = new DBHandler(context, null, null,1);
+        //ArrayList<DBData> photos = dbHandler.search(DBHandler.photosTable,
                 "campsite_id",curSite.getData("id"));
 
         if (!photos.isEmpty()) {
@@ -92,10 +94,10 @@ public class ListResultsAdapter extends RecyclerView.Adapter<ListResultsAdapter.
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                /*
+
                 DisplayCampsiteActivity.currentCampsite = Long.parseLong(searchResults.get(position).getData("id"));
                 Intent intent = new Intent(context, DisplayCampsiteActivity.class);
-                context.startActivity(intent);*/
+                context.startActivity(intent);
             }
         });
     }
@@ -106,4 +108,4 @@ public class ListResultsAdapter extends RecyclerView.Adapter<ListResultsAdapter.
         return searchResults.size();
     }
 }
-
+*/

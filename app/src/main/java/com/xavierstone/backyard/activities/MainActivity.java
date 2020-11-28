@@ -9,11 +9,18 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.xavierstone.backyard.R;
 import com.xavierstone.backyard.db.DBHandler;
 import com.xavierstone.backyard.models.User;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /*
 Page the app opens to, asks permissions
@@ -34,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     private final String[] locationRequest = new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION,
             android.Manifest.permission.ACCESS_FINE_LOCATION};
     private final String[] storageRequest = new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE};
+
+    public static DBHandler dbHandler = new DBHandler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

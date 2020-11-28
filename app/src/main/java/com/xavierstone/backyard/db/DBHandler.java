@@ -4,6 +4,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.AsyncTask;
+import android.print.pdf.PrintedPdfDocument;
+import android.util.JsonReader;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.xavierstone.backyard.activities.MainActivity;
@@ -11,21 +14,34 @@ import com.xavierstone.backyard.models.Pic;
 import com.xavierstone.backyard.models.Site;
 import com.xavierstone.backyard.models.User;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /*
 The DBHandler class handles relations with the Database
 It also contains hard-coded static representations of the SQLite tables
+
+Currently upgrading to MongoDB
  */
 
-public class DBHandler extends SQLiteOpenHelper {
+public class DBHandler /*extends SQLiteOpenHelper*/ {
 
     // database name and version
-    private static final int DB_VER = 1;
-    private static final String DB_NAME = "Backyard";
+    //private static final int DB_VER = 1;
+    //private static final String DB_NAME = "Backyard";
 
+    private final String dbUrl = "http://10.0.2.2:8080/";
+
+    /*
     // user account types
     public static final int LOCAL_ACCOUNT = 0;
     public static final int FACEBOOK_ACCOUNT = 1;
@@ -163,8 +179,13 @@ public class DBHandler extends SQLiteOpenHelper {
     @Override
     public synchronized void close() {
         super.close();
+    }*/
+
+    public DBHandler(){
+        // do something?
     }
 
+    /*
     // Inserts a row into the DB
     public long insert(DBData dbData){
         db = getWritableDatabase();
@@ -190,7 +211,7 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
 
         dbData.setData(colName, value);
-    }
+    }*/
 
     // Find methods
     // TODO: create find methods as needed
@@ -198,62 +219,99 @@ public class DBHandler extends SQLiteOpenHelper {
     // Find based on "term", only implemented for Site
     // Returns no results with an empty term
     public ArrayList<Site> findSites(String term) {
-        ArrayList<Site> results = new ArrayList<Site>();
-        // Check if term is empty, return empty list
-        if (term.equals(""))
-            return results;
+        ArrayList<Site> results = new ArrayList<>();
 
-        // Otherwise, generate where clause
-        String whereClause = "(name LIKE \"%" + term + "%\" OR " +
-                "description LIKE \"%" + term + "%\")";
+        String dataString;
+        String[] jsonResults;
+        try {
+            // Try connection to DB url
+            dataString = readUrl(dbUrl + "/sites?term="+term);
 
-        // Get raw results
-        ArrayList<DBData> rawResults = search(campsitesTable, whereClause);
+            // If successful, try to convert result to Json
+            try{
+                // parse out results
+                jsonResults = dataString.split("\\|");
 
-        // Iteratively translate results
-        for (DBData rawResult : rawResults){
-            // Parse attributes
-            long id = Long.parseLong(rawResult.getData("id"));
-            String name = rawResult.getData("name");
-            double lat = Double.parseDouble(rawResult.getData("lat"));
-            double lng = Double.parseDouble(rawResult.getData("long"));
-            String skinny = rawResult.getData("description");
+                for (String jsonResult : jsonResults){
+                    JSONObject currentJson = new JSONObject(jsonResult);
 
-            // Bundle lat/long
-            LatLng location = new LatLng(lat, lng);
+                    JSONObject latLongJson = (JSONObject) currentJson.get("location");
 
-            // Add new Site object
-            results.add(User.getCurrentUser().createCampsite(id, name, location, skinny));
+                    // Convert to Site type
+                    // TODO: update for users
+                    results.add(User.getCurrentUser().createCampsite(currentJson.getString("_id"),
+                            currentJson.getString("name"),
+                            new LatLng(Double.parseDouble(latLongJson.getString("lat")),
+                                    Double.parseDouble(latLongJson.getString("long"))),
+                            currentJson.getString("skinny")));
+                }
+            } catch (JSONException e) {
+                // On error, print message and return empty results list
+                System.out.println("Error, could not convert to Json");
+            }
+        } catch (Exception e) {
+            // On error, print message and return empty results list
+            System.out.println("Error, could not connect to "+dbUrl);
         }
 
         return results;
     }
 
-    // Find photos based on the parent campsite
-    // Returns true if at least one photo was loaded
-    public void loadSitePics(Site parent) {
-        ArrayList<Pic> results = new ArrayList<>();
+    private String readUrl(String urlString) throws Exception {
+        BufferedReader reader = null;
+        try {
+            URL url = new URL(urlString);
+            reader = new BufferedReader(new InputStreamReader(url.openStream()));
+            StringBuffer buffer = new StringBuffer();
+            int read;
+            char[] chars = new char[1024];
+            while ((read = reader.read(chars)) != -1)
+                buffer.append(chars, 0, read);
 
-        long parentId = parent.getId();
-
-        // Generate where clause
-        String whereClause = "campsite_id = \"" + parentId + "\"";
-
-        // Get raw results
-        ArrayList<DBData> rawResults = search(photosTable, whereClause);
-
-        // Iteratively translate results
-        for (DBData rawResult : rawResults){
-            // Parse attributes
-            long id = Long.parseLong(rawResult.getData("id"));
-            String filename = rawResult.getData("path");
-
-            // Add new Site object
-            // TODO: have the author reflect the author, currently not stored
-            parent.registerPic(new Pic(User.getCurrentUser(), parent, id, filename));
+            return buffer.toString();
+        } finally {
+            if (reader != null)
+                reader.close();
         }
     }
 
+    // Find photos based on the parent campsite
+    // Registers to campsite, no return value
+    public void loadSitePics(Site parent) {
+        String parentId = parent.getId();
+
+        String dataString;
+        String[] jsonResults;
+        try {
+            // Try connection to DB url
+            dataString = readUrl(dbUrl + "/pics?site="+parentId);
+
+            // If successful, try to convert result to Json
+            try{
+                // parse out results
+                jsonResults = dataString.split("\\|");
+
+                for (String jsonResult : jsonResults){
+                    JSONObject currentJson = new JSONObject(jsonResult);
+
+                    // Convert to Site type
+                    // TODO: update for users
+                    parent.registerPic(new Pic(User.getCurrentUser(), parent,
+                            currentJson.getString("_id"),
+                            currentJson.getString("data")));
+                }
+            } catch (JSONException e) {
+                // On error, print message and return empty results list
+                System.out.println("Error, could not convert to Json");
+            }
+        } catch (Exception e) {
+            // On error, print message and return empty results list
+            System.out.println("Error, could not connect to "+dbUrl);
+            e.printStackTrace();
+        }
+    }
+
+    /*
     // Searches for a single query in any column. Only exact matches can be used, no inequalities
     // or regex. Returns a list of results, even if there is only one.
     public ArrayList<DBData> search(Table table, String colName, String term){
@@ -309,7 +367,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
         // Return the list
         return resultsList;
-    }
+    }*/
 
     /*
     public boolean delete(Table table, String colName, String term) {
