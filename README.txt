@@ -1,21 +1,24 @@
-Backyard is an app for locating and reviewing campsites around the world.
+Backyard is an app for locating and reviewing campsites around the world (well, at least the Upper Connecticut River Valley).
 
-The current development version reflects a desire for the integration of functionality into a single interface.
-There is a lot of work left to go, but this is a good starting point.
+The current development version is really coming together. A lot of the auxiliary functionality is currently disabled, but the meat of the project is the priority. The full stack is currently enabled, but I'm not running an actual server, so testing it may be a pain. Feel free to take my word for it, but if you want to test it, do this:
+
+1) install MongoDB and run an instance
+2) using the mongoimport tool, import all collections from the db folder on this repo
+3) download the Backyard Server at github.com/xavierstone/backyard_server and run a Maven build with the goal "spring-boot:run"; this launches the server
+4) download the develop branch of this repo, run in Android Studio
 
 Please use the develop branch, as I have refrained from merging it into the master for the time being.
 
-Make sure you give it the permissions it asks for at the start, because I have had problems with the permission dialog in the past. While I am pretty sure the app can handle being denied permissions, I would rather you wait to check it out until I make a point of testing it myself.
+Things to Try:
+ - search for "trail"
+ - search for "gorge"
+ - click on the markers that pop up on the map to see more information for a given site
+ - check out the Quechee Gorge site, it has multiple images and thus demonstrates the photo gallery navigation
+ - create a site of your own on the MongoDB back end and verify that it shows up in a search
 
-The Android emulator requires you to manually set your location, and when you do, set it somewhere in the vicinity of 43.6396894,-72.3118208, which is around the same area most of the hardcoded campsites are.
-
-Pics are stored fairly small in the DB, so they may come out looking small depending on the screen resolution of your emulator. This is on my radar.
-
-Most buttons are currently disabled, while these features are nice, they are not essential to the app and I am prioritizing the essentials.
-
-The database is still implemented as SQLite and some of the functionality is still messy and inefficient, but if you want to check out previous commits you can compare it and it's definitely getting much better. Not to mention, all that messy functionality is now hidden behind a very clean layer of classes!
-
-Be sure to check out the data structures in the /.models package; these are all new and the only data structure before was /.db.DBData.java which you can check out but I don't really want to talk about.
+Unresolved:
+ - Pics are stored fairly small in the DB, so they may come out looking small depending on the screen resolution of your emulator.
+ - Most buttons are currently disabled, while these features are nice, they are not essential to the app and I am prioritizing the essentials.
 
 That's all for now,
 -Xavier
