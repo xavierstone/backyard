@@ -1,3 +1,4 @@
+/*
 package com.xavierstone.backyard.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,9 +25,9 @@ import com.xavierstone.backyard.db.DBHandler;
 
 import java.util.ArrayList;
 
-/*
-Provides the user with options for searching the campsite database
- */
+
+//Provides the user with options for searching the campsite database
+
 public class SearchOptionsActivity extends AppCompatActivity {
 
     // Text fields
@@ -63,7 +64,7 @@ public class SearchOptionsActivity extends AppCompatActivity {
         permission = (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) /*&&
                 (ContextCompat.checkSelfPermission( this,
-                        Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED)*/;
+                        Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED);
 
         if (!permission) {
             mapSearch.setVisibility(View.GONE);
@@ -176,3 +177,4 @@ public class SearchOptionsActivity extends AppCompatActivity {
         startActivity(intent);
     }
 }
+*/

@@ -3,7 +3,7 @@ package com.xavierstone.backyard.models;
 // User added review of a campsite
 public class Rant {
     // Attributes
-    private long id;
+    private String id;
     private byte stars; // Star rating, 1-5
     private String words; // review content
 
@@ -11,7 +11,7 @@ public class Rant {
     private final User author; // reviewer
     private final Site site; // campsite the review is of
 
-    public Rant(User author, Site site, long id, byte stars, String words) {
+    public Rant(User author, Site site, String id, byte stars, String words) {
         // Copy arguments
         this.author = author;
         this.site = site;
@@ -23,7 +23,7 @@ public class Rant {
     // Getters
     public User getAuthor() { return author; }
     public Site getSite() { return site; }
-    public long getId() { return id; }
+    public String getId() { return id; }
     public byte getStars() { return stars; }
     public String getWords() { return words; }
 

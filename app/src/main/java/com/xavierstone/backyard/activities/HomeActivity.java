@@ -4,6 +4,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.view.Gravity;
 import android.widget.Button;
 import android.widget.SearchView;
@@ -31,6 +32,10 @@ import com.xavierstone.backyard.db.DBHandler;
 import com.xavierstone.backyard.models.Site;
 import com.xavierstone.backyard.models.User;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 
 /*
@@ -44,7 +49,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
     private final ArrayList<Marker> markers = new ArrayList<>();
 
     // DBHandler
-    private DBHandler dbHome;
+    //private DBHandler dbHome;
 
     // Search results array, can be referenced from MapsActivity
     private ArrayList<Site> searchResults = new ArrayList<>();
@@ -53,11 +58,14 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
     private GoogleMap googleMap;
     private Button signButton;
 
+    private String query;
+
     // Location
     Location currentLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
 
     RatingBar ratingBar;
+    SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,31 +77,20 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         // Initialize signButton
         signButton = findViewById(R.id.signButton);
 
-        dbHome = new DBHandler();
+        //dbHome = new DBHandler();
 
         // Initialize Search Bar
-        final SearchView searchView = findViewById(R.id.searchBar);
+        searchView = findViewById(R.id.searchBar);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             // Activates when user clicks on search buttons
             @Override
-            public boolean onQueryTextSubmit(String query) {
+            public boolean onQueryTextSubmit(String querySource) {
+                query = querySource;
+                new searchSites().execute();
+
                 // Search for query
-                searchResults = dbHome.findSites(query);
-
-                // For non-empty result lists, update map
-                if (!searchResults.isEmpty()) {
-                    updateMapResults();
-                }else{
-                    // Otherwise, make a quick toast
-                    Toast noResults = Toast.makeText(HomeActivity.this,"No Sites Found",Toast.LENGTH_LONG);
-                    hideKeyboard();
-                    noResults.setGravity(Gravity.CENTER, 0, 0);
-                    noResults.show();
-                }
-
-                // Clear query
-                searchView.setQuery("", false);
+                //searchResults = dbHome.findSites(query);
 
                 return true;
             }
@@ -154,7 +151,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
 
     @Override
     protected void onDestroy() {
-        dbHome.close();
+        //dbHome.close();
         super.onDestroy();
     }
 
@@ -229,7 +226,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         googleMap.setOnMapClickListener(this);
 
         // If location permission available
-        if (MainActivity.checkPermission(MainActivity.LOCATION_REQUEST)) {
+        if (MainActivity.checkPermission(MainActivity.LOCATION_REQUEST) && currentLocation != null) {
             // Center on current location
             LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
             //MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("I am here!");
@@ -273,6 +270,32 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
             // Transfer to DisplayCampsiteActivity
             Intent intent = new Intent(HomeActivity.this, DisplayCampsiteActivity.class);
             startActivity(intent);
+        }
+    }
+
+    private class searchSites extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            searchResults = MainActivity.dbHandler.findSites(query);
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            // For non-empty result lists, update map
+            if (!searchResults.isEmpty()) {
+                updateMapResults();
+            }else{
+                // Otherwise, make a quick toast
+                Toast noResults = Toast.makeText(HomeActivity.this,"No Sites Found",Toast.LENGTH_LONG);
+                hideKeyboard();
+                noResults.setGravity(Gravity.CENTER, 0, 0);
+                noResults.show();
+            }
+
+            // Clear query
+            searchView.setQuery("", false);
+
+            super.onPostExecute(aVoid);
         }
     }
 

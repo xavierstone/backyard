@@ -136,14 +136,14 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         }
     }
 
-    private void updateRatings(){
+    private void updateRatings(){/*
         ArrayList<DBData> ratings = dbSite.search(DBHandler.ratingsTable, "campsite_id", ""+ currentSite);
         double totalRating = 0;
         for (int i = 0; i < ratings.size(); i++){
             totalRating+=Double.parseDouble(ratings.get(i).getData("stars"));
         }
         totalRating/=ratings.size();
-        ratingBar.setRating((float)totalRating);
+        ratingBar.setRating((float)totalRating);*/
     }
 
     /*
@@ -262,7 +262,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        dbSite.close();
+        //dbSite.close();
         super.onDestroy();
     }
 }
