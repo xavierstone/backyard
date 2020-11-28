@@ -1,8 +1,15 @@
 package com.xavierstone.backyard.models;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
+import android.view.Gravity;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.xavierstone.backyard.activities.DisplayCampsiteActivity;
+import com.xavierstone.backyard.activities.HomeActivity;
+import com.xavierstone.backyard.activities.MainActivity;
 import com.xavierstone.backyard.db.DBHandler;
 
 import java.util.ArrayList;
@@ -75,9 +82,8 @@ public class Site {
         // Just photos for now
         // TODO: add rants
 
-        // Load photos from DB
-        DBHandler dbHandler = new DBHandler();
-        dbHandler.loadSitePics(this);
+        // Kick off Async loadPics
+        //MainActivity.dbHandler.loadSitePics(User.getCurrentUser().getCurrentSite());
     }
 
     // Get current photo

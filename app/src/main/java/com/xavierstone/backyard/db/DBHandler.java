@@ -239,7 +239,7 @@ public class DBHandler /*extends SQLiteOpenHelper*/ {
 
                     // Convert to Site type
                     // TODO: update for users
-                    results.add(User.getCurrentUser().createCampsite(currentJson.get("_id").toString(),
+                    results.add(User.getCurrentUser().createCampsite(currentJson.getString("_id"),
                             currentJson.getString("name"),
                             new LatLng(Double.parseDouble(latLongJson.getString("lat")),
                                     Double.parseDouble(latLongJson.getString("long"))),
@@ -255,37 +255,6 @@ public class DBHandler /*extends SQLiteOpenHelper*/ {
         }
 
         return results;
-
-        /*
-        ArrayList<Site> results = new ArrayList<Site>();
-        // Check if term is empty, return empty list
-        if (term.equals(""))
-            return results;
-
-        // Otherwise, generate where clause
-        String whereClause = "(name LIKE \"%" + term + "%\" OR " +
-                "description LIKE \"%" + term + "%\")";
-
-        // Get raw results
-        ArrayList<DBData> rawResults = search(campsitesTable, whereClause);
-
-        // Iteratively translate results
-        for (DBData rawResult : rawResults){
-            // Parse attributes
-            long id = Long.parseLong(rawResult.getData("id"));
-            String name = rawResult.getData("name");
-            double lat = Double.parseDouble(rawResult.getData("lat"));
-            double lng = Double.parseDouble(rawResult.getData("long"));
-            String skinny = rawResult.getData("description");
-
-            // Bundle lat/long
-            LatLng location = new LatLng(lat, lng);
-
-            // Add new Site object
-            results.add(User.getCurrentUser().createCampsite(id, name, location, skinny));
-        }
-
-        return results;*/
     }
 
     private String readUrl(String urlString) throws Exception {
@@ -307,28 +276,39 @@ public class DBHandler /*extends SQLiteOpenHelper*/ {
     }
 
     // Find photos based on the parent campsite
-    // Returns true if at least one photo was loaded
+    // Registers to campsite, no return value
     public void loadSitePics(Site parent) {
-        /*ArrayList<Pic> results = new ArrayList<>();
+        String parentId = parent.getId();
 
-        long parentId = parent.getId();
+        String dataString;
+        String[] jsonResults;
+        try {
+            // Try connection to DB url
+            dataString = readUrl(dbUrl + "/pics?site="+parentId);
 
-        // Generate where clause
-        String whereClause = "campsite_id = \"" + parentId + "\"";
+            // If successful, try to convert result to Json
+            try{
+                // parse out results
+                jsonResults = dataString.split("\\|");
 
-        // Get raw results
-        ArrayList<DBData> rawResults = search(photosTable, whereClause);
+                for (String jsonResult : jsonResults){
+                    JSONObject currentJson = new JSONObject(jsonResult);
 
-        // Iteratively translate results
-        for (DBData rawResult : rawResults){
-            // Parse attributes
-            String id = Long.parseLong(rawResult.getData("id"));
-            String filename = rawResult.getData("path");
-
-            // Add new Site object
-            // TODO: have the author reflect the author, currently not stored
-            parent.registerPic(new Pic(User.getCurrentUser(), parent, id, filename));
-        }*/
+                    // Convert to Site type
+                    // TODO: update for users
+                    parent.registerPic(new Pic(User.getCurrentUser(), parent,
+                            currentJson.getString("_id"),
+                            currentJson.getString("data")));
+                }
+            } catch (JSONException e) {
+                // On error, print message and return empty results list
+                System.out.println("Error, could not convert to Json");
+            }
+        } catch (Exception e) {
+            // On error, print message and return empty results list
+            System.out.println("Error, could not connect to "+dbUrl);
+            e.printStackTrace();
+        }
     }
 
     /*
