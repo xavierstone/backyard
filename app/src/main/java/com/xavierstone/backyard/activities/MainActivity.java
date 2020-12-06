@@ -16,12 +16,6 @@ import com.xavierstone.backyard.R;
 import com.xavierstone.backyard.db.DBHandler;
 import com.xavierstone.backyard.models.User;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 /*
 Page the app opens to, asks permissions
  */
@@ -75,6 +69,31 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         // Rest of code is in permission result functions
     }
 
+    private class getTestUser extends AsyncTask<Void, Void, Void> {
+        boolean validCreds;
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            // Check to see if test user exists in DB
+            validCreds = User.signIn("test","test");
+
+            //testUser = User.createAccount("test","test","test");
+
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            // Sign in test user
+            // User.signIn(testUser);
+
+            // Transfer control to Home Activity
+            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+            startActivity(intent);
+
+            super.onPostExecute(aVoid);
+        }
+    }
+
     // This function waits for a result from the permission request
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
@@ -100,11 +119,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     // Checks off the final I's and goes to the HomeActivity
     public void permissionsResult() {
         // Initialize test user
-        User.signIn("test@test.com","test");
-
-        // Transfer control to Home Activity
-        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-        startActivity(intent);
+        new getTestUser().execute();
     }
 
     public static boolean checkPermission(int permissionID) {
