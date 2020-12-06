@@ -70,23 +70,21 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     }
 
     private class getTestUser extends AsyncTask<Void, Void, Void> {
-        User testUser;
+        boolean validCreds;
 
         @Override
         protected Void doInBackground(Void... voids) {
             // Check to see if test user exists in DB
-            testUser = MainActivity.dbHandler.loadUser("test");
+            validCreds = User.signIn("test","test");
 
-            // If not, create
-            if (testUser == null)
-                testUser = User.createAccount("test","test","test");
+            //testUser = User.createAccount("test","test","test");
 
             return null;
         }
         @Override
         protected void onPostExecute(Void aVoid) {
             // Sign in test user
-            User.signIn(testUser);
+            // User.signIn(testUser);
 
             // Transfer control to Home Activity
             Intent intent = new Intent(MainActivity.this, HomeActivity.class);

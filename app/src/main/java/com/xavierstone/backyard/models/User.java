@@ -8,7 +8,7 @@ import java.util.ArrayList;
 // Represents the user
 public class User {
     // Static current user
-    private static User currentUser;
+    private static User currentUser = null;
 
     // Attributes
     private String id; // SQLite ID
@@ -67,20 +67,17 @@ public class User {
 
     // Sign In
     // TODO: correctly implement sign in
-    public static User signIn(User user) {
-        currentUser = user;
-
-        return currentUser;
+    public static boolean signIn(String email, String password) {
+        User result = MainActivity.dbHandler.validateUser(email, password);
+        if (result != null) {
+            currentUser = result;
+            return true;
+        }else
+            return false;
     }
 
     public static User createAccount(String name, String email, String password){
         return MainActivity.dbHandler.createAccount(name, email, password);
-    }
-
-    // Validate credentials
-    public boolean validateSignIn() {
-        // TODO: implement sign in
-        return true;
     }
 
     // Creator methods

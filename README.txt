@@ -16,6 +16,8 @@ Things to Try:
  - check out the Quechee Gorge site, it has multiple images and thus demonstrates the photo gallery navigation
  - create a site of your own on the MongoDB back end and verify that it shows up in a search
 
+The app automatically signs in a test user, but credentials are validated against the database and passwords are stored as a salt/hash combination.
+
 Unresolved:
  - Pics are stored fairly small in the DB, so they may come out looking small depending on the screen resolution of your emulator.
  - Most buttons are currently disabled, while these features are nice, they are not essential to the app and I am prioritizing the essentials.

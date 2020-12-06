@@ -324,14 +324,13 @@ public class DBHandler /*extends SQLiteOpenHelper*/ {
         }
     }
 
-    // Loads a user
-    // TODO: update for verification
-    public User loadUser(String email){
+    // Loads a user, verifies ID
+    public User validateUser(String email, String password){
         String dataString;
         String[] jsonResults;
         try {
             // Try connection to DB url
-            dataString = readUrl(dbUrl + "/users/get?email=" + email);
+            dataString = readUrl(dbUrl + "/users/get?email="+email);
 
             // If successful, try to convert result to Json
             try{
@@ -341,11 +340,14 @@ public class DBHandler /*extends SQLiteOpenHelper*/ {
                 for (String jsonResult : jsonResults){
                     JSONObject currentJson = new JSONObject(jsonResult);
 
-                    // Convert to Site type
-                    // TODO: update for users
-                    return (new User(currentJson.getString("_id"),
+                    byte[] salt = Base64.decode(currentJson.getString("salt"), Base64.DEFAULT);
+                    HashHelper hashHelper = new HashHelper(password, salt);
+                    if (hashHelper.checkMatch(Base64.decode(currentJson.getString("hash"),Base64.DEFAULT)))
+                        return (new User(currentJson.getString("_id"),
                             currentJson.getString("name"),
                             email));
+                    else
+                        return null;
                 }
             } catch (JSONException e) {
                 // On error, print message and return empty results list
@@ -359,8 +361,6 @@ public class DBHandler /*extends SQLiteOpenHelper*/ {
         return null;
     }
 
-    // Possible errors: id wrong format, hash null
-
     // Create a new user, hash password and push to Mongo
     public User createAccount(String name, String email, String password){
         // Hash the password
@@ -368,7 +368,10 @@ public class DBHandler /*extends SQLiteOpenHelper*/ {
         BufferedReader reader = null;
 
         try {
+            byte[] rawSalt = hashHelper.getSalt();
             byte[] rawHash = hashHelper.getHash();
+
+            String salt = Base64.encodeToString(rawSalt, Base64.DEFAULT);
             String hash = Base64.encodeToString(rawHash, Base64.DEFAULT);
 
             try{
@@ -382,6 +385,7 @@ public class DBHandler /*extends SQLiteOpenHelper*/ {
                 arguments.put("name", name);
                 arguments.put("email", email);
                 arguments.put("hash", hash);
+                arguments.put("salt", salt);
                 StringJoiner sj = null;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     sj = new StringJoiner("&");
