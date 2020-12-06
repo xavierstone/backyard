@@ -11,16 +11,25 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import com.xavierstone.backyard.R;
 import com.xavierstone.backyard.db.DBHandler;
 import com.xavierstone.backyard.models.User;
+import com.xavierstone.backyard.security.HashHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
+
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 
 /*
 Page the app opens to, asks permissions
