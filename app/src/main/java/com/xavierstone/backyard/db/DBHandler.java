@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
 import android.print.pdf.PrintedPdfDocument;
+import android.util.Base64;
 import android.util.JsonReader;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -13,6 +14,8 @@ import com.xavierstone.backyard.activities.MainActivity;
 import com.xavierstone.backyard.models.Pic;
 import com.xavierstone.backyard.models.Site;
 import com.xavierstone.backyard.models.User;
+import com.xavierstone.backyard.models.UserSkeleton;
+import com.xavierstone.backyard.security.HashHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,9 +25,19 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.StringJoiner;
 
 /*
 The DBHandler class handles relations with the Database
@@ -309,6 +322,105 @@ public class DBHandler /*extends SQLiteOpenHelper*/ {
             System.out.println("Error, could not connect to "+dbUrl);
             e.printStackTrace();
         }
+    }
+
+    // Loads a user
+    // TODO: update for verification
+    public User loadUser(String email){
+        String dataString;
+        String[] jsonResults;
+        try {
+            // Try connection to DB url
+            dataString = readUrl(dbUrl + "/users/get?email=" + email);
+
+            // If successful, try to convert result to Json
+            try{
+                // parse out results
+                jsonResults = dataString.split("\\|");
+
+                for (String jsonResult : jsonResults){
+                    JSONObject currentJson = new JSONObject(jsonResult);
+
+                    // Convert to Site type
+                    // TODO: update for users
+                    return (new User(currentJson.getString("_id"),
+                            currentJson.getString("name"),
+                            email));
+                }
+            } catch (JSONException e) {
+                // On error, print message and return empty results list
+                System.out.println("Error, could not convert to Json");
+            }
+        } catch (Exception e) {
+            // On error, print message and return empty results list
+            System.out.println("Error, could not connect to "+dbUrl);
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Possible errors: id wrong format, hash null
+
+    // Create a new user, hash password and push to Mongo
+    public User createAccount(String name, String email, String password){
+        // Hash the password
+        HashHelper hashHelper = new HashHelper(password);
+        BufferedReader reader = null;
+
+        try {
+            byte[] rawHash = hashHelper.getHash();
+            String hash = Base64.encodeToString(rawHash, Base64.DEFAULT);
+
+            try{
+                // Thanks to user Ferrybig, StackOverflow
+                URL url = new URL(dbUrl + "/users/add");
+                URLConnection con = url.openConnection();
+                HttpURLConnection http = (HttpURLConnection)con;
+                http.setRequestMethod("POST");
+                http.setDoOutput(true);
+                Map<String,String> arguments = new HashMap<>();
+                arguments.put("name", name);
+                arguments.put("email", email);
+                arguments.put("hash", hash);
+                StringJoiner sj = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    sj = new StringJoiner("&");
+                    for (Map.Entry<String, String> entry : arguments.entrySet())
+                        sj.add(URLEncoder.encode(entry.getKey(), "UTF-8") + "="
+                                + URLEncoder.encode(entry.getValue(), "UTF-8"));
+                    byte[] out = sj.toString().getBytes(StandardCharsets.UTF_8);
+                    int length = out.length;
+                    http.setFixedLengthStreamingMode(length);
+                    http.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+                    http.connect();
+                    try(OutputStream os = http.getOutputStream()) {
+                        os.write(out);
+                    }
+                    reader = new BufferedReader(new InputStreamReader(http.getInputStream()));
+                    StringBuffer buffer = new StringBuffer();
+                    int read;
+                    char[] chars = new char[1024];
+                    while ((read = reader.read(chars)) != -1)
+                        buffer.append(chars, 0, read);
+
+                    reader.close();
+
+                    return new User(reader.toString(), name, email);
+                }
+
+
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+
+            // In the middle of this;
+            //   - connect to server
+            //   - finish server side implementation
+            //   - test it
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /*

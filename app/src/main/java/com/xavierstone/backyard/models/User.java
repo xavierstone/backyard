@@ -1,6 +1,7 @@
 package com.xavierstone.backyard.models;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.xavierstone.backyard.activities.MainActivity;
 
 import java.util.ArrayList;
 
@@ -13,7 +14,6 @@ public class User {
     private String id; // SQLite ID
     private String name; // single field for first name, last name, nickname etc.
     private String email; // email address
-    private String password; // plain text password
 
     // ArrayLists
     private final ArrayList<Site> faves; // favorite sites
@@ -24,12 +24,11 @@ public class User {
     // Marker for site the user is currently viewing/interacting with
     private Site currentSite;
 
-    public User(String id, String name, String email, String password){
+    public User(String id, String name, String email){
         // create user with specified attributes
         this.id = id;
         this.name = name;
         this.email = email;
-        this.password = password;
 
         // initialize lists
         faves = new ArrayList<>();
@@ -44,7 +43,6 @@ public class User {
     // Setters
     public void setName(String name) { this.name = name; }
     public void setEmail(String email) { this.email = email; }
-    public void setPassword(String password) { this.password = password; }
 
     // Set current site, forces a full load of site data
     public void setCurrentSite(Site site) {
@@ -59,7 +57,6 @@ public class User {
     public String getId() { return id; }
     public String getName() { return name; }
     public String getEmail() { return email; }
-    public String getPassword() { return password; }
     public Site getCurrentSite() { return currentSite; }
 
     // Version 0.1 array list getters
@@ -70,11 +67,14 @@ public class User {
 
     // Sign In
     // TODO: correctly implement sign in
-    public static User signIn(String email, String password) {
-        if (currentUser == null)
-            currentUser = new User("0","test", email, password);
+    public static User signIn(User user) {
+        currentUser = user;
 
         return currentUser;
+    }
+
+    public static User createAccount(String name, String email, String password){
+        return MainActivity.dbHandler.createAccount(name, email, password);
     }
 
     // Validate credentials

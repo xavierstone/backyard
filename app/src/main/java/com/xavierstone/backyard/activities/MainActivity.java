@@ -11,25 +11,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.widget.TextView;
 
 import com.xavierstone.backyard.R;
 import com.xavierstone.backyard.db.DBHandler;
 import com.xavierstone.backyard.models.User;
-import com.xavierstone.backyard.security.HashHelper;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
-
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 
 /*
 Page the app opens to, asks permissions
@@ -84,6 +69,33 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         // Rest of code is in permission result functions
     }
 
+    private class getTestUser extends AsyncTask<Void, Void, Void> {
+        User testUser;
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            // Check to see if test user exists in DB
+            testUser = MainActivity.dbHandler.loadUser("test");
+
+            // If not, create
+            if (testUser == null)
+                testUser = User.createAccount("test","test","test");
+
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            // Sign in test user
+            User.signIn(testUser);
+
+            // Transfer control to Home Activity
+            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+            startActivity(intent);
+
+            super.onPostExecute(aVoid);
+        }
+    }
+
     // This function waits for a result from the permission request
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
@@ -109,11 +121,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     // Checks off the final I's and goes to the HomeActivity
     public void permissionsResult() {
         // Initialize test user
-        User.signIn("test@test.com","test");
-
-        // Transfer control to Home Activity
-        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-        startActivity(intent);
+        new getTestUser().execute();
     }
 
     public static boolean checkPermission(int permissionID) {
