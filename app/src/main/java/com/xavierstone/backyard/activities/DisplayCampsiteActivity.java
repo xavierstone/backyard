@@ -5,22 +5,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.xavierstone.backyard.R;
-import com.xavierstone.backyard.db.DBData;
-import com.xavierstone.backyard.db.DBHandler;
 import com.xavierstone.backyard.models.Site;
 import com.xavierstone.backyard.models.User;
-
-import java.util.ArrayList;
 
 /*
 This activity displays the selected campsite

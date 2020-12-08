@@ -14,9 +14,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.xavierstone.backyard.db.DBData;
 import com.xavierstone.backyard.db.DBHandler;
-import com.xavierstone.backyard.db.InternalStorage;
 import com.xavierstone.backyard.R;
 import com.xavierstone.backyard.models.Site;
 import com.xavierstone.backyard.models.User;
@@ -116,7 +114,7 @@ public class AddCampsiteActivity extends AppCompatActivity {
 
     // Updates the ImageView based on the current photo
     private void updatePhoto(){
-        addPhotosDisplay.setImageBitmap(InternalStorage.loadExternalImage(this, photos.get(currentPhoto)));
+        //addPhotosDisplay.setImageBitmap(InternalStorage.loadExternalImage(this, photos.get(currentPhoto)));
     }
 
     // Gallery navigation
