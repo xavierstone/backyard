@@ -36,7 +36,7 @@ public class Pic {
 
     // Load from internal storage
     // Returns bitmap
-    public Bitmap loadImage(){
+    public Bitmap loadImage(Activity currentActivity){
         // Construct filepath from components
         String filepath = resourcePrefix + MainActivity.PACKAGE_NAME + drawableDirectory + filename;
 
@@ -46,7 +46,7 @@ public class Pic {
         // Try opening bitmap
         Bitmap bitmap;
         try {
-            bitmap = BitmapFactory.decodeStream(MainActivity.currentActivity.getContentResolver().openInputStream(targetUri));
+            bitmap = BitmapFactory.decodeStream(currentActivity.getContentResolver().openInputStream(targetUri));
 
             // Return if successful
             return bitmap;

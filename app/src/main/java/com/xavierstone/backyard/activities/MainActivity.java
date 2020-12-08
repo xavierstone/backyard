@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     public static String PACKAGE_NAME;
 
     // Context tracking
-    public static Activity currentActivity;
+    //public static Activity currentActivity;
 
     // Permission managment
     public static int LOCATION_REQUEST=0;
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         setContentView(R.layout.activity_main);
 
         PACKAGE_NAME = this.getPackageName();
-        currentActivity = this;
+        //currentActivity = this;
     }
 
     @Override
@@ -52,12 +52,12 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         super.onStart();
 
         // Check for location permission
-        if (!checkPermission(LOCATION_REQUEST)) {
+        if (!checkPermission(this, LOCATION_REQUEST)) {
             // Not enabled, request location permission
             ActivityCompat.requestPermissions(this, locationRequest, LOCATION_REQUEST);
         }else{
             // Yes enabled! Check for storage permission
-            if (!checkPermission(STORAGE_REQUEST)) {
+            if (!checkPermission(this, STORAGE_REQUEST)) {
                 // Nope, request it
                 ActivityCompat.requestPermissions(this, storageRequest, STORAGE_REQUEST);
             }else{
@@ -69,38 +69,13 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         // Rest of code is in permission result functions
     }
 
-    private class getTestUser extends AsyncTask<Void, Void, Void> {
-        boolean validCreds;
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            // Check to see if test user exists in DB
-            validCreds = User.signIn("test","test");
-
-            //testUser = User.createAccount("test","test","test");
-
-            return null;
-        }
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            // Sign in test user
-            // User.signIn(testUser);
-
-            // Transfer control to Home Activity
-            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-            startActivity(intent);
-
-            super.onPostExecute(aVoid);
-        }
-    }
-
     // This function waits for a result from the permission request
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
         // Check for requestCode
         if (requestCode == LOCATION_REQUEST){
             // Location was requested; Check to see if storage was granted
-            if (checkPermission(STORAGE_REQUEST)){
+            if (checkPermission(this, STORAGE_REQUEST)){
                 // Yes!!! Finish this off
                 permissionsResult();
             }else{
@@ -116,13 +91,34 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     }
 
     // This function is the final result of the permissions labyrinth
-    // Checks off the final I's and goes to the HomeActivity
+    // Executes the async task to sign in the test user
     public void permissionsResult() {
         // Initialize test user
         new getTestUser().execute();
     }
 
-    public static boolean checkPermission(int permissionID) {
+    private class getTestUser extends AsyncTask<Void, Void, Void> {
+        boolean validCreds;
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            // Check to see if test user exists in DB
+            validCreds = User.signIn("test","test");
+
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            // Transfer control to Home Activity
+            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+            startActivity(intent);
+
+            super.onPostExecute(aVoid);
+        }
+    }
+
+    // Handles the actual permission checking
+    public static boolean checkPermission(Activity currentActivity, int permissionID) {
         int approved = PackageManager.PERMISSION_GRANTED;
         boolean permGranted = false;
 
@@ -133,68 +129,17 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             String fineLocPerm = Manifest.permission.ACCESS_FINE_LOCATION;
 
             // Check permission
-            permGranted = ( ContextCompat.checkSelfPermission(MainActivity.currentActivity, coarseLocPerm) == approved
-                    &&  ContextCompat.checkSelfPermission(MainActivity.currentActivity, fineLocPerm) == approved);
+            permGranted = ( ContextCompat.checkSelfPermission(currentActivity, coarseLocPerm) == approved
+                    &&  ContextCompat.checkSelfPermission(currentActivity, fineLocPerm) == approved);
 
         }else if (permissionID == STORAGE_REQUEST) { // If permission ID is storage request
             // Get permission string
             String storagePerm = Manifest.permission.READ_EXTERNAL_STORAGE;
 
             // Check permission
-            permGranted = ( ContextCompat.checkSelfPermission(MainActivity.currentActivity, storagePerm) == approved );
+            permGranted = ( ContextCompat.checkSelfPermission(currentActivity, storagePerm) == approved );
         }
 
         return permGranted;
     }
-
-    /*
-    // Verifies the user's credentials and signs them in
-    public void signIn(View view) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        // Read from boxes
-        String email = emailAddressBox.getText().toString();
-        String password = passwordBox.getText().toString();
-
-        // Create handler and query DB for user email address
-        DBHandler dbHandler = new DBHandler(this, null, null, 1);
-        ArrayList<DBData> searchResults = dbHandler.search(DBHandler.usersTable, "email", email);
-        int returnCode;
-        DBData user = null;
-
-        if (!searchResults.isEmpty()) {
-            user = searchResults.get(0);
-
-            // Read credentials from internal storage
-            returnCode = InternalStorage.readCredentials(this, email, password);
-        }else{
-            returnCode = InternalStorage.DOES_NOT_EXIST;
-        }
-
-        // Interpret result
-        switch (returnCode){
-            case InternalStorage.VERIFIED:
-                // Pass control and user ID to Home Activity
-                this.userID = Integer.parseInt(user.getData("id"));
-                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-                startActivity(intent);
-                break;
-            case InternalStorage.DOES_NOT_EXIST:
-                // User does not exist
-                emailAddressBox.setText("");
-                passwordBox.setText("");
-                loginFeedbackView.setText("No user account with that email address.");
-                break;
-            case InternalStorage.WRONG_PASSWORD:
-                //Incorrect password
-                passwordBox.setText("");
-                loginFeedbackView.setText("Incorrect password.");
-                break;
-        }
-    }
-
-    // Passes control to the CreateAccount Activity
-    public void createAccount(View view){
-        // Start Create Account activity
-        Intent intent = new Intent(MainActivity.this, CreateAccountActivity.class);
-        startActivity(intent);
-    }*/
 }

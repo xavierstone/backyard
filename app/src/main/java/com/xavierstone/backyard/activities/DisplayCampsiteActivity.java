@@ -43,7 +43,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_campsite);
 
-        MainActivity.currentActivity = this;
+        //MainActivity.currentActivity = this;
 
         // Get current!
         currentSite = User.getCurrentUser().getCurrentSite();
@@ -93,7 +93,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
 
     protected void updatePicDisplay() {
         //Check for read external permission
-        boolean storagePermission = MainActivity.checkPermission(MainActivity.STORAGE_REQUEST);
+        boolean storagePermission = MainActivity.checkPermission(this, MainActivity.STORAGE_REQUEST);
 
         int numPics = currentSite.getPics().size();
 
@@ -120,7 +120,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
     private void setVisibilities(boolean showCurrentPic, boolean showGallery) {
         if (showCurrentPic) {
             currentPic.setVisibility(View.VISIBLE);
-            currentPic.setImageBitmap(currentSite.getCurrentPic());
+            currentPic.setImageBitmap(currentSite.getCurrentPic(this));
 
             // Hide status text
             displayCampsiteStatus.setVisibility(View.GONE);
@@ -184,7 +184,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         currentSite.scrollGallery(-1);
 
         // Load photo
-        currentPic.setImageBitmap(currentSite.getCurrentPic());
+        currentPic.setImageBitmap(currentSite.getCurrentPic(this));
     }
 
     public void galleryForward(View view){
@@ -192,7 +192,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         currentSite.scrollGallery(-1);
 
         // Load photo
-        currentPic.setImageBitmap(currentSite.getCurrentPic());
+        currentPic.setImageBitmap(currentSite.getCurrentPic(this));
     }
 
     // Adds a rating

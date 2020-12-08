@@ -72,7 +72,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        MainActivity.currentActivity = this;
+        //MainActivity.currentActivity = this;
 
         // Initialize signButton
         signButton = findViewById(R.id.signButton);
@@ -103,7 +103,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
 
         // Initialize Location Provider
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        if (MainActivity.checkPermission(MainActivity.LOCATION_REQUEST)) {
+        if (MainActivity.checkPermission(this, MainActivity.LOCATION_REQUEST)) {
             // if location enabled, wait for location check to come through to create map
             fetchLocation();
         }else{
@@ -116,7 +116,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
 
     // Checks for location, waits on result and calls for a map
     private void fetchLocation() {
-        if (MainActivity.checkPermission(MainActivity.LOCATION_REQUEST)) {
+        if (MainActivity.checkPermission(this, MainActivity.LOCATION_REQUEST)) {
             Task<Location> task = fusedLocationProviderClient.getLastLocation();
             task.addOnSuccessListener(new OnSuccessListener<Location>() {
                 @Override
@@ -226,7 +226,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         googleMap.setOnMapClickListener(this);
 
         // If location permission available
-        if (MainActivity.checkPermission(MainActivity.LOCATION_REQUEST) && currentLocation != null) {
+        if (MainActivity.checkPermission(this, MainActivity.LOCATION_REQUEST) && currentLocation != null) {
             // Center on current location
             LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
             //MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("I am here!");

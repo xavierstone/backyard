@@ -1,5 +1,6 @@
 package com.xavierstone.backyard.models;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -87,11 +88,11 @@ public class Site {
     }
 
     // Get current photo
-    public Bitmap getCurrentPic() {
+    public Bitmap getCurrentPic(Activity currentActivity) {
         if (pics.isEmpty())
             return null;
 
-        return pics.get(currentPic).loadImage();
+        return pics.get(currentPic).loadImage(currentActivity);
     }
 
     // Moves the current photo by an increment, only designed for 1 or -1
