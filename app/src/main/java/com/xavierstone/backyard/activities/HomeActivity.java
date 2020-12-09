@@ -1,5 +1,7 @@
 package com.xavierstone.backyard.activities;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.PermissionChecker;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 
@@ -18,11 +20,15 @@ import android.widget.RatingBar;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -51,7 +57,8 @@ Provides the user with a multi-activity home screen
 Integrates map functionality with main navigation and search bar
  */
 
-public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWindowClickListener, OnMapReadyCallback, GoogleMap.OnMapClickListener {
+public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWindowClickListener, OnMapReadyCallback,
+        GoogleMap.OnMapClickListener, GoogleMap.OnMyLocationButtonClickListener {
 
     // Marker list
     private final ArrayList<Marker> markers = new ArrayList<>();
@@ -127,10 +134,6 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
             public boolean onQueryTextSubmit(String querySource) {
                 query = querySource;
                 new searchSites().execute();
-
-                // Search for query
-                //searchResults = dbHome.findSites(query);
-
                 return true;
             }
 
@@ -139,31 +142,63 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
                 return false;
             }
         });
-
-        // Initialize Location Provider
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        if (MainActivity.checkPermission(this, MainActivity.LOCATION_REQUEST)) {
-            // if location enabled, wait for location check to come through to create map
-            fetchLocation();
-        }else{
-            // Otherwise just DO it!
-            loadMap();
-        }
     }
 
-    // Checks for location, waits on result and calls for a map
-    private void fetchLocation() {
-        if (MainActivity.checkPermission(this, MainActivity.LOCATION_REQUEST)) {
-            Task<Location> task = fusedLocationProviderClient.getLastLocation();
-            task.addOnSuccessListener(new OnSuccessListener<Location>() {
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // Initialize Location Provider
+        LocationRequest mLocationRequest = LocationRequest.create();
+        mLocationRequest.setInterval(60000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        LocationCallback mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    if (location != null) {
+                        //TODO: UI updates.
+                    }
+                }
+            }
+        };
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, MainActivity.permissions[0]) == PermissionChecker.PERMISSION_GRANTED) {
+            LocationServices.getFusedLocationProviderClient(this).requestLocationUpdates(mLocationRequest, mLocationCallback, null);
+            LocationServices.getFusedLocationProviderClient(this).getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
-                    if (location != null) currentLocation = location;
+                    //TODO: UI updates.
+                    currentLocation = location;
 
                     // Load the Google Map Fragment
                     loadMap();
                 }
             });
+            /*
+            // if location enabled, wait for location check to come through to create map
+            Task<Location> task = fusedLocationProviderClient.getLastLocation();
+            task.addOnSuccessListener(new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    if (location != null){
+                        currentLocation = location;
+
+                        // Load the Google Map Fragment
+                        loadMap();
+                    }
+                }
+            });
+
+             */
+        }else{
+            // Otherwise just DO it!
+            loadMap();
         }
     }
 
@@ -257,7 +292,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         googleMap.setOnMapClickListener(this);
 
         // If location permission available
-        if (MainActivity.checkPermission(this, MainActivity.LOCATION_REQUEST) && currentLocation != null) {
+        if (currentLocation != null) {
             // Center on current location
             LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
             //MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("I am here!");
@@ -266,13 +301,28 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
             //googleMap.addMarker(markerOptions);
 
             // Enable location
-            googleMap.setMyLocationEnabled(true);
+            if (ActivityCompat.checkSelfPermission(this, MainActivity.permissions[0]) == PermissionChecker.PERMISSION_GRANTED) {
+                googleMap.setMyLocationEnabled(true);
+                googleMap.setOnMyLocationButtonClickListener(this);
+            }
         }
     }
 
     @Override
     public void onMapClick(LatLng latLng) {
         hideKeyboard();
+    }
+
+    @Override
+    public boolean onMyLocationButtonClick() {
+        // Center on current location
+        LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+        //MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("I am here!");
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+        //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+        //googleMap.addMarker(markerOptions);
+
+        return true;
     }
 
     private void hideKeyboard(){

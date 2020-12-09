@@ -94,28 +94,28 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
 
     protected void updatePicDisplay() {
         //Check for read external permission
-        boolean storagePermission = MainActivity.checkPermission(this, MainActivity.STORAGE_REQUEST);
+        //boolean storagePermission = MainActivity.checkPermission(this, MainActivity.STORAGE_REQUEST);
 
         int numPics = currentSite.getPics().size();
 
         // Modify layout based on file permissions
-        if (!storagePermission){
+        /*if (false){
             // Disable upload button, do not load images
             displayCampsiteStatus.setText(R.string.noFilePerms);
             setVisibilities(false, false);
-        }else{
-            // Check for pics load
-            if (!picsLoaded){
-                displayCampsiteStatus.setText(R.string.picsLoading);
+        }else{*/
+        // Check for pics load
+        if (!picsLoaded){
+            displayCampsiteStatus.setText(R.string.picsLoading);
+            setVisibilities(false, false);
+        }else {
+            // adjust display based on number of photos
+            if (numPics == 0) {
+                displayCampsiteStatus.setText(R.string.noPicsFound);
                 setVisibilities(false, false);
-            }else {
-                // adjust display based on number of photos
-                if (numPics == 0) {
-                    displayCampsiteStatus.setText(R.string.noPicsFound);
-                    setVisibilities(false, false);
-                } else setVisibilities(true, numPics != 1);
-            }
+            } else setVisibilities(true, numPics != 1);
         }
+        //}
     }
 
     private void setVisibilities(boolean showCurrentPic, boolean showGallery) {

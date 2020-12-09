@@ -4,7 +4,6 @@
     package="com.xavierstone.backyard">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission
         android:name="android.permission.MANAGE_DOCUMENTS"
         tools:ignore="ProtectedPermissions" />
@@ -41,7 +40,7 @@
 
         <activity android:name="com.xavierstone.backyard.activities.DisplayCampsiteActivity" />
         <activity android:name="com.xavierstone.backyard.activities.AddCampsiteActivity" />
-        <activity android:name="com.xavierstone.backyard.activities.HomeActivity" />
+        <activity android:name="com.xavierstone.backyard.activities.HomeActivity"/>
         <activity android:name="com.xavierstone.backyard.activities.CreateAccountActivity" />
         <activity android:name="com.xavierstone.backyard.activities.MainActivity">
             <intent-filter>
