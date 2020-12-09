@@ -1,7 +1,10 @@
 package com.xavierstone.backyard.models;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.xavierstone.backyard.BackyardApplication;
 import com.xavierstone.backyard.activities.MainActivity;
+import com.xavierstone.backyard.db.DBHandler;
+import com.xavierstone.backyard.db.LoginResponse;
 
 import java.util.ArrayList;
 
@@ -43,6 +46,7 @@ public class User {
     // Setters
     public void setName(String name) { this.name = name; }
     public void setEmail(String email) { this.email = email; }
+    public static void setCurrentUser(User currentUser) { User.currentUser = currentUser; }
 
     // Set current site, forces a full load of site data
     public void setCurrentSite(Site site) {
@@ -64,21 +68,6 @@ public class User {
     public ArrayList<Rant> getRants() { return rants; }
     public ArrayList<Site> getCreatedSites() { return createdSites; }
     public ArrayList<Pic> getCreatedPics() { return createdPics; }
-
-    // Sign In
-    // TODO: correctly implement sign in
-    public static boolean signIn(String email, String password) {
-        User result = MainActivity.dbHandler.validateUser(email, password);
-        if (result != null) {
-            currentUser = result;
-            return true;
-        }else
-            return false;
-    }
-
-    public static User createAccount(String name, String email, String password){
-        return MainActivity.dbHandler.createAccount(name, email, password);
-    }
 
     // Creator methods
     // Need updating to properly handle ID field with database

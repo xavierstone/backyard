@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.xavierstone.backyard.BackyardApplication;
 import com.xavierstone.backyard.R;
 import com.xavierstone.backyard.models.Site;
 import com.xavierstone.backyard.models.User;
@@ -269,7 +270,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
     private class loadPics extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
-            MainActivity.dbHandler.loadSitePics(currentSite);
+            BackyardApplication.getDB().loadSitePics(currentSite);
             return null;
         }
         @Override

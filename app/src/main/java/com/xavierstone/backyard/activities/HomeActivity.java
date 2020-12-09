@@ -1,10 +1,12 @@
 package com.xavierstone.backyard.activities;
 
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Observer;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.Gravity;
 import android.widget.Button;
 import android.widget.SearchView;
@@ -27,8 +29,13 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.xavierstone.backyard.BackyardApplication;
 import com.xavierstone.backyard.R;
+import com.xavierstone.backyard.db.DBCallback;
 import com.xavierstone.backyard.db.DBHandler;
+import com.xavierstone.backyard.db.LoginRepository;
+import com.xavierstone.backyard.db.LoginResponse;
+import com.xavierstone.backyard.db.Result;
 import com.xavierstone.backyard.models.Site;
 import com.xavierstone.backyard.models.User;
 
@@ -37,6 +44,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.concurrent.Executor;
 
 /*
 Provides the user with a multi-activity home screen
@@ -51,7 +59,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
     // DBHandler
     //private DBHandler dbHome;
 
-    // Search results array, can be referenced from MapsActivity
+    // Search results array
     private ArrayList<Site> searchResults = new ArrayList<>();
 
     // Views
@@ -64,6 +72,10 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
     Location currentLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
 
+    // Sign In
+    LoginRepository loginRepository;
+    Observer<Result<User>> resultObserver;
+
     RatingBar ratingBar;
     SearchView searchView;
 
@@ -72,12 +84,37 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        //MainActivity.currentActivity = this;
+        // Login initialization
+        resultObserver = new Observer<Result<User>>() {
+            @Override
+            public void onChanged(Result<User> result) {
+                if (result instanceof Result.Success) {
+                    User.setCurrentUser(((Result.Success<User>) result).data);
+                    signButton.setText(R.string.signButtonTextAlt);
+
+                    // toast to our success
+                    Toast signInSuccess = Toast.makeText(HomeActivity.this,"Sign In Successful!",Toast.LENGTH_LONG);
+                    signInSuccess.setGravity(Gravity.CENTER, 0, 0);
+                    signInSuccess.show();
+                }else{
+                    signButton.setText(R.string.signButtonText);
+
+                    // toast to our... failure?
+                    Toast signInFailure = Toast.makeText(HomeActivity.this,"Do You Even Go Here?",Toast.LENGTH_LONG);
+                    signInFailure.setGravity(Gravity.CENTER, 0, 0);
+                    signInFailure.show();
+                }
+            }
+        };
+
+        // Initialize repo
+        loginRepository = new LoginRepository(BackyardApplication.getExecutorService(), BackyardApplication.getThreadHandler(), this, resultObserver);
+
+        // Initialize test user
+        loginRepository.signIn("test","test");
 
         // Initialize signButton
         signButton = findViewById(R.id.signButton);
-
-        //dbHome = new DBHandler();
 
         // Initialize Search Bar
         searchView = findViewById(R.id.searchBar);
@@ -110,8 +147,6 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
             // Otherwise just DO it!
             loadMap();
         }
-
-        //ratingBar = findViewById(R.id.ratingBarHome);
     }
 
     // Checks for location, waits on result and calls for a map
@@ -147,12 +182,6 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
             signButton.setText(R.string.signButtonText);
         else
             signButton.setText(R.string.signButtonTextAlt);
-    }
-
-    @Override
-    protected void onDestroy() {
-        //dbHome.close();
-        super.onDestroy();
     }
 
     private void updateMapResults(){
@@ -276,7 +305,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
     private class searchSites extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
-            searchResults = MainActivity.dbHandler.findSites(query);
+            searchResults = BackyardApplication.getDB().findSites(query);
             return null;
         }
         @Override

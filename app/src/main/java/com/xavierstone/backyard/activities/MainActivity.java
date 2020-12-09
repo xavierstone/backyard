@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import com.xavierstone.backyard.BackyardApplication;
 import com.xavierstone.backyard.R;
 import com.xavierstone.backyard.db.DBHandler;
 import com.xavierstone.backyard.models.User;
@@ -25,9 +26,6 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     // Package name
     public static String PACKAGE_NAME;
 
-    // Context tracking
-    //public static Activity currentActivity;
-
     // Permission managment
     public static int LOCATION_REQUEST=0;
     public static int STORAGE_REQUEST=1;
@@ -36,15 +34,12 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             android.Manifest.permission.ACCESS_FINE_LOCATION};
     private final String[] storageRequest = new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE};
 
-    public static DBHandler dbHandler = new DBHandler();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         PACKAGE_NAME = this.getPackageName();
-        //currentActivity = this;
     }
 
     @Override
@@ -52,14 +47,14 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         super.onStart();
 
         // Check for location permission
-        if (!checkPermission(this, LOCATION_REQUEST)) {
+        if (!checkPermission(MainActivity.this, LOCATION_REQUEST)) {
             // Not enabled, request location permission
-            ActivityCompat.requestPermissions(this, locationRequest, LOCATION_REQUEST);
+            ActivityCompat.requestPermissions(MainActivity.this, locationRequest, LOCATION_REQUEST);
         }else{
             // Yes enabled! Check for storage permission
-            if (!checkPermission(this, STORAGE_REQUEST)) {
+            if (!checkPermission(MainActivity.this, STORAGE_REQUEST)) {
                 // Nope, request it
-                ActivityCompat.requestPermissions(this, storageRequest, STORAGE_REQUEST);
+                ActivityCompat.requestPermissions(MainActivity.this, storageRequest, STORAGE_REQUEST);
             }else{
                 // Yay!!! Both permissions! Let's go!
                 permissionsResult();
@@ -91,30 +86,11 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     }
 
     // This function is the final result of the permissions labyrinth
-    // Executes the async task to sign in the test user
+    // Passes control to home activity
     public void permissionsResult() {
-        // Initialize test user
-        new getTestUser().execute();
-    }
-
-    private class getTestUser extends AsyncTask<Void, Void, Void> {
-        boolean validCreds;
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            // Check to see if test user exists in DB
-            validCreds = User.signIn("test","test");
-
-            return null;
-        }
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            // Transfer control to Home Activity
-            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-            startActivity(intent);
-
-            super.onPostExecute(aVoid);
-        }
+        // Transfer control to Home Activity
+        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+        startActivity(intent);
     }
 
     // Handles the actual permission checking
