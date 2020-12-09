@@ -74,7 +74,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
 
     // Sign In
     LoginRepository loginRepository;
-    Observer<Result<User>> resultObserver;
+    Observer<Result<LoginResponse>> resultObserver;
 
     RatingBar ratingBar;
     SearchView searchView;
@@ -85,24 +85,26 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         setContentView(R.layout.activity_home);
 
         // Login initialization
-        resultObserver = new Observer<Result<User>>() {
+        resultObserver = new Observer<Result<LoginResponse>>() {
             @Override
-            public void onChanged(Result<User> result) {
+            public void onChanged(Result<LoginResponse> result) {
                 if (result instanceof Result.Success) {
-                    User.setCurrentUser(((Result.Success<User>) result).data);
-                    signButton.setText(R.string.signButtonTextAlt);
+                    if (((Result.Success<LoginResponse>) result).data.getResult()) {
+                        User.setCurrentUser(((Result.Success<LoginResponse>) result).data.getData());
+                        signButton.setText(R.string.signButtonTextAlt);
 
-                    // toast to our success
-                    Toast signInSuccess = Toast.makeText(HomeActivity.this,"Sign In Successful!",Toast.LENGTH_LONG);
-                    signInSuccess.setGravity(Gravity.CENTER, 0, 0);
-                    signInSuccess.show();
-                }else{
-                    signButton.setText(R.string.signButtonText);
+                        // toast to our success
+                        Toast signInSuccess = Toast.makeText(HomeActivity.this, "Sign In Successful!", Toast.LENGTH_LONG);
+                        signInSuccess.setGravity(Gravity.CENTER, 0, 0);
+                        signInSuccess.show();
+                    }else{
+                        signButton.setText(R.string.signButtonText);
 
-                    // toast to our... failure?
-                    Toast signInFailure = Toast.makeText(HomeActivity.this,"Do You Even Go Here?",Toast.LENGTH_LONG);
-                    signInFailure.setGravity(Gravity.CENTER, 0, 0);
-                    signInFailure.show();
+                        // toast to our... failure?
+                        Toast signInFailure = Toast.makeText(HomeActivity.this,"Do You Even Go Here?",Toast.LENGTH_LONG);
+                        signInFailure.setGravity(Gravity.CENTER, 0, 0);
+                        signInFailure.show();
+                    }
                 }
             }
         };
