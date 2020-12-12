@@ -198,6 +198,9 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
              */
         }else{
             // Otherwise just DO it!
+            Toast noLocPerm = Toast.makeText(HomeActivity.this,"You're Not Letting Us Spy on You...",Toast.LENGTH_LONG);
+            noLocPerm.setGravity(Gravity.CENTER, 0, 0);
+            noLocPerm.show();
             loadMap();
         }
     }
