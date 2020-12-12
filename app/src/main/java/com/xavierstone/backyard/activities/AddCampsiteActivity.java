@@ -73,7 +73,7 @@ public class AddCampsiteActivity extends AppCompatActivity {
             addCampsiteStatus.setText("");
         }
 
-        currentCampsite = User.getCurrentUser().getCurrentSite();
+        currentCampsite = Site.getCurrentSite();
     }
 
     // Returns to the home screen

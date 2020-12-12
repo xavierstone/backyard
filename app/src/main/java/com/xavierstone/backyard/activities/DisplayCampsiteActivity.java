@@ -47,7 +47,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         //MainActivity.currentActivity = this;
 
         // Get current!
-        currentSite = User.getCurrentUser().getCurrentSite();
+        currentSite = Site.getCurrentSite();
 
         // Start picsloader
         new loadPics().execute();

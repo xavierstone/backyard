@@ -335,7 +335,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         if (marker.getTag().getClass() == Site.class) {
             Site current = (Site) marker.getTag();
             // retrieve campsite tag and set current campsite; kicks off async transfer
-            User.getCurrentUser().setCurrentSite((Site) marker.getTag());
+            Site.setCurrentSite((Site) marker.getTag());
 
             // Transfer to DisplayCampsiteActivity
             Intent intent = new Intent(HomeActivity.this, DisplayCampsiteActivity.class);

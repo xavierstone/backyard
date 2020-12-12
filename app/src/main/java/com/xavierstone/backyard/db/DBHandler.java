@@ -67,7 +67,7 @@ public class DBHandler {
 
                     // Convert to Site type
                     // TODO: update for users
-                    results.add(User.getCurrentUser().createCampsite(currentJson.getString("_id"),
+                    results.add(new Site(null, currentJson.getString("_id"),
                             currentJson.getString("name"),
                             new LatLng(Double.parseDouble(latLongJson.getString("lat")),
                                     Double.parseDouble(latLongJson.getString("long"))),
@@ -106,7 +106,7 @@ public class DBHandler {
 
                     // Convert to Site type
                     // TODO: update for users
-                    parent.registerPic(new Pic(User.getCurrentUser(), parent,
+                    parent.registerPic(new Pic(null, parent,
                             currentJson.getString("_id"),
                             currentJson.getString("data")));
                 }
