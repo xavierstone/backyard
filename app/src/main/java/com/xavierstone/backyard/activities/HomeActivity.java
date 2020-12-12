@@ -281,7 +281,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         // Enable map click listener
         googleMap.setOnMapClickListener(this);
 
-        // If location permission available
+        // If location found
         if (currentLocation != null) {
             // Center on current location
             LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
@@ -289,12 +289,13 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
             //googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
             //googleMap.addMarker(markerOptions);
+        }
 
-            // Enable location
-            if (ActivityCompat.checkSelfPermission(this, MainActivity.permissions[0]) == PermissionChecker.PERMISSION_GRANTED) {
-                googleMap.setMyLocationEnabled(true);
-                googleMap.setOnMyLocationButtonClickListener(this);
-            }
+        // if permission given
+        // Enable location
+        if (ActivityCompat.checkSelfPermission(this, MainActivity.permissions[0]) == PermissionChecker.PERMISSION_GRANTED) {
+            googleMap.setMyLocationEnabled(true);
+            googleMap.setOnMyLocationButtonClickListener(this);
         }
     }
 
@@ -359,7 +360,44 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
 
     @Override
     public void onDialogPositiveClick(DialogFragment dialog, String name, String email, String password) {
+        new createAccount(name, email, password).execute();
+    }
 
+    private class createAccount extends AsyncTask<Void, Void, Void> {
+        String name, email, password;
+        User createdUser;
+
+        public createAccount(String name, String email, String password){
+            this.name = name;
+            this.password = password;
+            this.email = email;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            createdUser = BackyardApplication.getDB().createAccount(name, email, password);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            // For created user
+            if (createdUser != null){
+                // Otherwise, make a quick toast
+                Toast accountCreated = Toast.makeText(HomeActivity.this,"Account Created!",Toast.LENGTH_LONG);
+                hideKeyboard();
+                accountCreated.setGravity(Gravity.CENTER, 0, 0);
+                accountCreated.show();
+                loginRepository.signIn(email, password);
+            }else{
+                Toast accountNotCreated = Toast.makeText(HomeActivity.this,"Account Creation Failed",Toast.LENGTH_LONG);
+                hideKeyboard();
+                accountNotCreated.setGravity(Gravity.CENTER, 0, 0);
+                accountNotCreated.show();
+            }
+
+            super.onPostExecute(aVoid);
+        }
     }
 
     private class searchSites extends AsyncTask<Void, Void, Void> {

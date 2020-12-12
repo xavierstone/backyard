@@ -139,11 +139,13 @@ public class DBHandler {
 
                     byte[] salt = Base64.decode(currentJson.getString("salt"), Base64.DEFAULT);
                     HashHelper hashHelper = new HashHelper(password, salt);
-                    if (hashHelper.checkMatch(Base64.decode(currentJson.getString("hash"),Base64.DEFAULT)))
-                        return (new User(currentJson.getString("_id"),
-                            currentJson.getString("name"),
-                            email));
-                    else
+                    if (hashHelper.checkMatch(Base64.decode(currentJson.getString("hash"),Base64.DEFAULT))) {
+                        User signedUser = new User(currentJson.getString("_id"),
+                                currentJson.getString("name"),
+                                email);
+                        User.setCurrentUser(signedUser);
+                        return signedUser;
+                    }else
                         return null;
                 }
             } catch (JSONException e) {

@@ -60,7 +60,7 @@ public class CreateAccountDialogFragment extends DialogFragment {
         // Pass null as the parent view because its going in the dialog layout
         builder.setView(dialogView)
                 // Add action buttons
-                .setPositiveButton(R.string.signButtonText, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.createAccount, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         listener.onDialogPositiveClick(CreateAccountDialogFragment.this,

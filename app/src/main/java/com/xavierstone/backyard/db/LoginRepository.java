@@ -38,7 +38,6 @@ public class LoginRepository {
     }
 
     // Sign In
-    // TODO: correctly implement sign in
     public void signIn(final String email, final String password, final DBCallback<LoginResponse> callback) {
         executor.execute(new Runnable() {
             @Override
@@ -68,9 +67,5 @@ public class LoginRepository {
                 callback.onComplete(result);
             }
         });
-    }
-
-    public User createAccount(String name, String email, String password){
-        return db.createAccount(name, email, password);
     }
 }
