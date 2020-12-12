@@ -346,6 +346,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
     @Override
     public void onDialogPositiveClick(DialogFragment dialog, String email, String password) {
         loginRepository.signIn(email, password);
+        hideKeyboard();
     }
 
     private class searchSites extends AsyncTask<Void, Void, Void> {
