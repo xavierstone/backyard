@@ -27,6 +27,7 @@
     <string name="addButtonText">Add</string>
     <string name="signButtonText">Sign In</string>
     <string name="signButtonTextAlt">Sign Out</string>
+    <string name="cancel">Cancel</string>
     <string name="helpButtonText">Help</string>
     <string name="noFilePerms">File permissions disabled, images cannot be loaded</string>
     <string name="noSiteName">The Site that Can Be Named<br/>is Not the True Site</string>

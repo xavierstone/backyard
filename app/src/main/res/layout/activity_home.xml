@@ -71,7 +71,7 @@
             android:id="@+id/signButton"
             style="@style/MainNavButton"
             android:drawableTop="@android:drawable/ic_lock_idle_lock"
-            android:enabled="false"
+            android:onClick="accountButton"
             android:text="@string/signButtonText" />
 
         <Button

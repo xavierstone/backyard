@@ -2,6 +2,7 @@ package com.xavierstone.backyard.activities;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.PermissionChecker;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 
@@ -58,7 +59,7 @@ Integrates map functionality with main navigation and search bar
  */
 
 public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWindowClickListener, OnMapReadyCallback,
-        GoogleMap.OnMapClickListener, GoogleMap.OnMyLocationButtonClickListener {
+        GoogleMap.OnMapClickListener, GoogleMap.OnMyLocationButtonClickListener, SignInDialogFragment.SignInDialogListener {
 
     // Marker list
     private final ArrayList<Marker> markers = new ArrayList<>();
@@ -81,6 +82,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
 
     // Sign In
     LoginRepository loginRepository;
+    DialogFragment signInDialog;
     Observer<Result<LoginResponse>> resultObserver;
 
     RatingBar ratingBar;
@@ -119,8 +121,8 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         // Initialize repo
         loginRepository = new LoginRepository(BackyardApplication.getExecutorService(), BackyardApplication.getThreadHandler(), this, resultObserver);
 
-        // Initialize test user
-        loginRepository.signIn("test","test");
+        // Initialize dialog
+        signInDialog = new SignInDialogFragment();
 
         // Initialize signButton
         signButton = findViewById(R.id.signButton);
@@ -180,22 +182,6 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
                     loadMap();
                 }
             });
-            /*
-            // if location enabled, wait for location check to come through to create map
-            Task<Location> task = fusedLocationProviderClient.getLastLocation();
-            task.addOnSuccessListener(new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null){
-                        currentLocation = location;
-
-                        // Load the Google Map Fragment
-                        loadMap();
-                    }
-                }
-            });
-
-             */
         }else{
             // Otherwise just DO it!
             Toast noLocPerm = Toast.makeText(HomeActivity.this,"You're Not Letting Us Spy on You...",Toast.LENGTH_LONG);
@@ -357,6 +343,11 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         }
     }
 
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog, String email, String password) {
+        loginRepository.signIn(email, password);
+    }
+
     private class searchSites extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
@@ -380,6 +371,16 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
             searchView.setQuery("", false);
 
             super.onPostExecute(aVoid);
+        }
+    }
+
+    // Represents the sign in/out button
+    public void accountButton(View view){
+        // Determine whether or not someone is signed in
+        if (User.getCurrentUser() == null){
+            // no one is signed in
+            // show sign in dialog
+            signInDialog.show(getSupportFragmentManager(),"signInDialog");
         }
     }
 
@@ -438,15 +439,6 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
     public void goToContactUs(View view){
         // Transfer control to Contact Us Activity
         Intent intent = new Intent(HomeActivity.this, ContactUsActivity.class);
-        startActivity(intent);
-    }
-
-    // Logs Out
-    public void logout(View view){
-        // Transfer control to Contact Us Activity
-        MainActivity.dontLogIn = true;
-        MainActivity.userID = 0;
-        Intent intent = new Intent(HomeActivity.this, MainActivity.class);
         startActivity(intent);
     }*/
 }
