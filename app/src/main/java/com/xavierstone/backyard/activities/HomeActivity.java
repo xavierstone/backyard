@@ -59,7 +59,8 @@ Integrates map functionality with main navigation and search bar
  */
 
 public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWindowClickListener, OnMapReadyCallback,
-        GoogleMap.OnMapClickListener, GoogleMap.OnMyLocationButtonClickListener, SignInDialogFragment.SignInDialogListener {
+        GoogleMap.OnMapClickListener, GoogleMap.OnMyLocationButtonClickListener, SignInDialogFragment.SignInDialogListener,
+        CreateAccountDialogFragment.CreateAccountDialogListener {
 
     // Marker list
     private final ArrayList<Marker> markers = new ArrayList<>();
@@ -121,7 +122,7 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         // Initialize repo
         loginRepository = new LoginRepository(BackyardApplication.getExecutorService(), BackyardApplication.getThreadHandler(), this, resultObserver);
 
-        // Initialize dialog
+        // Initialize dialogs
         signInDialog = new SignInDialogFragment();
 
         // Initialize signButton
@@ -347,6 +348,18 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
     public void onDialogPositiveClick(DialogFragment dialog, String email, String password) {
         loginRepository.signIn(email, password);
         hideKeyboard();
+    }
+
+    @Override
+    public void onDialogNeutralClick(DialogFragment dialog, String email, String password) {
+        CreateAccountDialogFragment createAccountDialog = new CreateAccountDialogFragment(email, password);
+        createAccountDialog.show(getSupportFragmentManager(), "createAccountDialog");
+        hideKeyboard();
+    }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog, String name, String email, String password) {
+
     }
 
     private class searchSites extends AsyncTask<Void, Void, Void> {
