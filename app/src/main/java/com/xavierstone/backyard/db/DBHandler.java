@@ -12,9 +12,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -39,6 +41,15 @@ public class DBHandler {
     // TODO: does the constructor actually need to do anything?
     public DBHandler(){
         // do something?
+    }
+
+    public boolean testConnection(){
+        try{
+            String dataString = readUrl(dbUrl + "/sites?term=trail");
+            return (!dataString.equals(""));
+        } catch (Exception e){
+            return false;
+        }
     }
 
     // Find methods

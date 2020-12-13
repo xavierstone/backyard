@@ -94,6 +94,8 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        //new testConnection().execute();
+
         // Login initialization
         resultObserver = new Observer<Result<LoginResponse>>() {
             @Override
@@ -362,6 +364,27 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
     public void onDialogPositiveClick(DialogFragment dialog, String name, String email, String password) {
         new createAccount(name, email, password).execute();
     }
+
+    /*
+    private class testConnection extends AsyncTask<Void, Void, Void> {
+        boolean connection;
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            connection = BackyardApplication.getDB().testConnection();
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (!connection){
+                Toast connectionFailed = Toast.makeText(HomeActivity.this,"Could Not Connect to Server",Toast.LENGTH_LONG);
+                hideKeyboard();
+                connectionFailed.setGravity(Gravity.CENTER, 0, 0);
+                connectionFailed.show();
+            }
+            super.onPostExecute(aVoid);
+        }
+    }*/
 
     private class createAccount extends AsyncTask<Void, Void, Void> {
         String name, email, password;
