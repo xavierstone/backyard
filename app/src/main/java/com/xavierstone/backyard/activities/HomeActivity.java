@@ -60,7 +60,7 @@ Integrates map functionality with main navigation and search bar
 
 public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWindowClickListener, OnMapReadyCallback,
         GoogleMap.OnMapClickListener, GoogleMap.OnMyLocationButtonClickListener, SignInDialogFragment.SignInDialogListener,
-        CreateAccountDialogFragment.CreateAccountDialogListener {
+        CreateAccountDialogFragment.CreateAccountDialogListener, SignOutDialogFragment.SignOutDialogListener {
 
     // Marker list
     private final ArrayList<Marker> markers = new ArrayList<>();
@@ -365,6 +365,20 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
         new createAccount(name, email, password).execute();
     }
 
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        User.setCurrentUser(null);
+        Toast byee = Toast.makeText(HomeActivity.this,"MmmByeeeeee",Toast.LENGTH_LONG);
+        hideKeyboard();
+        byee.setGravity(Gravity.CENTER, 0, 0);
+        byee.show();
+    }
+
+    @Override
+    public void onDialogNeutralClick(DialogFragment dialog) {
+        signInDialog.show(getSupportFragmentManager(), "signInDialog");
+    }
+
     /*
     private class testConnection extends AsyncTask<Void, Void, Void> {
         boolean connection;
@@ -456,6 +470,10 @@ public class HomeActivity extends FragmentActivity implements GoogleMap.OnInfoWi
             // no one is signed in
             // show sign in dialog
             signInDialog.show(getSupportFragmentManager(),"signInDialog");
+        }else{
+            // someone is signed in... for now!
+            SignOutDialogFragment signOutDialogFragment = new SignOutDialogFragment();
+            signOutDialogFragment.show(getSupportFragmentManager(), "signOutDialog");
         }
     }
 

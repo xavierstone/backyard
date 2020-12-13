@@ -21,6 +21,8 @@
     <string name="addButtonText">Add</string>
     <string name="signButtonText">Sign In</string>
     <string name="signButtonTextAlt">Sign Out</string>
+    <string name="signOutDialogText">Leaving So Soon?</string>
+    <string name="switchUsers">Switch Users</string>
     <string name="createAccount">Create Account</string>
     <string name="cancel">Cancel</string>
     <string name="helpButtonText">Help</string>
