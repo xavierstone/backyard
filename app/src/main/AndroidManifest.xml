@@ -2,13 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.xavierstone.backyard">
-    <!--
-         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
-         Google Maps Android API v2, but you must specify either coarse or fine
-         location permissions for the 'MyLocation' functionality.
-    -->
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission
         android:name="android.permission.MANAGE_DOCUMENTS"
         tools:ignore="ProtectedPermissions" />
@@ -20,6 +15,7 @@
 
 
     <application
+        android:name="com.xavierstone.backyard.BackyardApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -42,12 +38,9 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name="com.xavierstone.backyard.activities.ContactUsActivity" />
-        <activity android:name="com.xavierstone.backyard.activities.AboutThisAppActivity" />
-        <activity android:name="com.xavierstone.backyard.activities.MapResultsActivity" />
         <activity android:name="com.xavierstone.backyard.activities.DisplayCampsiteActivity" />
         <activity android:name="com.xavierstone.backyard.activities.AddCampsiteActivity" />
-        <activity android:name="com.xavierstone.backyard.activities.HomeActivity" />
+        <activity android:name="com.xavierstone.backyard.activities.HomeActivity"/>
         <activity android:name="com.xavierstone.backyard.activities.CreateAccountActivity" />
         <activity android:name="com.xavierstone.backyard.activities.MainActivity">
             <intent-filter>

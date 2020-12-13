@@ -5,22 +5,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.xavierstone.backyard.BackyardApplication;
 import com.xavierstone.backyard.R;
-import com.xavierstone.backyard.db.DBData;
-import com.xavierstone.backyard.db.DBHandler;
 import com.xavierstone.backyard.models.Site;
 import com.xavierstone.backyard.models.User;
-
-import java.util.ArrayList;
 
 /*
 This activity displays the selected campsite
@@ -49,10 +44,10 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_campsite);
 
-        MainActivity.currentActivity = this;
+        //MainActivity.currentActivity = this;
 
         // Get current!
-        currentSite = User.getCurrentUser().getCurrentSite();
+        currentSite = Site.getCurrentSite();
 
         // Start picsloader
         new loadPics().execute();
@@ -99,34 +94,34 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
 
     protected void updatePicDisplay() {
         //Check for read external permission
-        boolean storagePermission = MainActivity.checkPermission(MainActivity.STORAGE_REQUEST);
+        //boolean storagePermission = MainActivity.checkPermission(this, MainActivity.STORAGE_REQUEST);
 
         int numPics = currentSite.getPics().size();
 
         // Modify layout based on file permissions
-        if (!storagePermission){
+        /*if (false){
             // Disable upload button, do not load images
             displayCampsiteStatus.setText(R.string.noFilePerms);
             setVisibilities(false, false);
-        }else{
-            // Check for pics load
-            if (!picsLoaded){
-                displayCampsiteStatus.setText(R.string.picsLoading);
+        }else{*/
+        // Check for pics load
+        if (!picsLoaded){
+            displayCampsiteStatus.setText(R.string.picsLoading);
+            setVisibilities(false, false);
+        }else {
+            // adjust display based on number of photos
+            if (numPics == 0) {
+                displayCampsiteStatus.setText(R.string.noPicsFound);
                 setVisibilities(false, false);
-            }else {
-                // adjust display based on number of photos
-                if (numPics == 0) {
-                    displayCampsiteStatus.setText(R.string.noPicsFound);
-                    setVisibilities(false, false);
-                } else setVisibilities(true, numPics != 1);
-            }
+            } else setVisibilities(true, numPics != 1);
         }
+        //}
     }
 
     private void setVisibilities(boolean showCurrentPic, boolean showGallery) {
         if (showCurrentPic) {
             currentPic.setVisibility(View.VISIBLE);
-            currentPic.setImageBitmap(currentSite.getCurrentPic());
+            currentPic.setImageBitmap(currentSite.getCurrentPic(this));
 
             // Hide status text
             displayCampsiteStatus.setVisibility(View.GONE);
@@ -190,7 +185,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         currentSite.scrollGallery(-1);
 
         // Load photo
-        currentPic.setImageBitmap(currentSite.getCurrentPic());
+        currentPic.setImageBitmap(currentSite.getCurrentPic(this));
     }
 
     public void galleryForward(View view){
@@ -198,7 +193,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
         currentSite.scrollGallery(-1);
 
         // Load photo
-        currentPic.setImageBitmap(currentSite.getCurrentPic());
+        currentPic.setImageBitmap(currentSite.getCurrentPic(this));
     }
 
     // Adds a rating
@@ -275,7 +270,7 @@ public class DisplayCampsiteActivity extends AppCompatActivity {
     private class loadPics extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
-            MainActivity.dbHandler.loadSitePics(currentSite);
+            BackyardApplication.getDB().loadSitePics(currentSite);
             return null;
         }
         @Override

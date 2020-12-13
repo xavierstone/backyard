@@ -1,7 +1,10 @@
 package com.xavierstone.backyard.models;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.xavierstone.backyard.BackyardApplication;
 import com.xavierstone.backyard.activities.MainActivity;
+import com.xavierstone.backyard.db.DBHandler;
+import com.xavierstone.backyard.db.LoginResponse;
 
 import java.util.ArrayList;
 
@@ -20,9 +23,6 @@ public class User {
     private final ArrayList<Rant> rants; // reviews
     private final ArrayList<Site> createdSites;
     private final ArrayList<Pic> createdPics;
-
-    // Marker for site the user is currently viewing/interacting with
-    private Site currentSite;
 
     public User(String id, String name, String email){
         // create user with specified attributes
@@ -43,12 +43,7 @@ public class User {
     // Setters
     public void setName(String name) { this.name = name; }
     public void setEmail(String email) { this.email = email; }
-
-    // Set current site, forces a full load of site data
-    public void setCurrentSite(Site site) {
-        this.currentSite = site;
-        currentSite.loadCampsite();
-    }
+    public static void setCurrentUser(User currentUser) { User.currentUser = currentUser; }
 
     // Add favorite site
     public void addFave(Site site) { faves.add(site); }
@@ -57,28 +52,12 @@ public class User {
     public String getId() { return id; }
     public String getName() { return name; }
     public String getEmail() { return email; }
-    public Site getCurrentSite() { return currentSite; }
 
     // Version 0.1 array list getters
     public ArrayList<Site> getFaves() { return faves; }
     public ArrayList<Rant> getRants() { return rants; }
     public ArrayList<Site> getCreatedSites() { return createdSites; }
     public ArrayList<Pic> getCreatedPics() { return createdPics; }
-
-    // Sign In
-    // TODO: correctly implement sign in
-    public static boolean signIn(String email, String password) {
-        User result = MainActivity.dbHandler.validateUser(email, password);
-        if (result != null) {
-            currentUser = result;
-            return true;
-        }else
-            return false;
-    }
-
-    public static User createAccount(String name, String email, String password){
-        return MainActivity.dbHandler.createAccount(name, email, password);
-    }
 
     // Creator methods
     // Need updating to properly handle ID field with database
@@ -90,22 +69,22 @@ public class User {
 
     // Add a rant to the current site
     public Rant addRant(byte stars, String words) {
-        Rant newRant = new Rant(this, currentSite, id, stars, words);       // create rant
-        currentSite.registerRant(newRant);                                      // register with campsite
+        Rant newRant = new Rant(this, Site.getCurrentSite(), id, stars, words);       // create rant
+        Site.getCurrentSite().registerRant(newRant);                                      // register with campsite
         return newRant;
     }
 
     // Add a pic to the current site
     public Pic addPic(String uri) {
-        Pic newPic = new Pic(this, currentSite, id, uri);     // create pic
-        currentSite.registerPic(newPic);                    // register with campsite
+        Pic newPic = new Pic(this, Site.getCurrentSite(), id, uri);     // create pic
+        Site.getCurrentSite().registerPic(newPic);                    // register with campsite
         return newPic;
     }
 
     // Update site methods
-    public void updateSiteName(String newName) { currentSite.setName(this, newName); }
-    public void updateSiteLocation(LatLng newLoc) { currentSite.setLocation(this, newLoc); }
-    public void updateSiteSkinny(String newSkinny) { currentSite.setSkinny(this, newSkinny); }
+    public void updateSiteName(String newName) { Site.getCurrentSite().setName(this, newName); }
+    public void updateSiteLocation(LatLng newLoc) { Site.getCurrentSite().setLocation(this, newLoc); }
+    public void updateSiteSkinny(String newSkinny) { Site.getCurrentSite().setSkinny(this, newSkinny); }
 
     // Update rant methods
     public void updateRantStars(Rant rant, byte newStars) { rant.setStars(this, newStars); }

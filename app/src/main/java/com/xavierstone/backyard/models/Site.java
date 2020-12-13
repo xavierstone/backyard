@@ -1,5 +1,6 @@
 package com.xavierstone.backyard.models;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -30,6 +31,9 @@ public class Site {
     private final ArrayList<Pic> pics; // site photos in order to be displayed
     private final ArrayList<Rant> rants; // site reviews
 
+    // Marker for site the user is currently viewing/interacting with
+    private static Site currentSite;
+
     // Constructor should be called before adding any photos or reviews
     public Site(User author, String id, String name, LatLng location, String skinny) {
         // Copy arguments
@@ -54,6 +58,7 @@ public class Site {
     public String getSkinny() { return skinny; }
     public ArrayList<Pic> getPics() { return pics; }
     public ArrayList<Rant> getRants() { return rants; }
+    public static Site getCurrentSite() { return currentSite; }
 
     // Get star rating
     public float getStars() {
@@ -86,12 +91,18 @@ public class Site {
         //MainActivity.dbHandler.loadSitePics(User.getCurrentUser().getCurrentSite());
     }
 
+    // Set current site, forces a full load of site data
+    public static void setCurrentSite(Site site) {
+        currentSite = site;
+        //currentSite.loadCampsite();
+    }
+
     // Get current photo
-    public Bitmap getCurrentPic() {
+    public Bitmap getCurrentPic(Activity currentActivity) {
         if (pics.isEmpty())
             return null;
 
-        return pics.get(currentPic).loadImage();
+        return pics.get(currentPic).loadImage(currentActivity);
     }
 
     // Moves the current photo by an increment, only designed for 1 or -1
