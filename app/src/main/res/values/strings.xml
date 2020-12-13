@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">Campsite Locator</string>
-    <string name="firstName">First Name</string>
-    <string name="lastName">Last Name</string>
+    <string name="app_name">BackYard</string>
+    <string name="loading">Loading…</string>
+    <string name="name">What Your Friends Call You</string>
     <string name="emailAddress">Email Address</string>
     <string name="password">Password</string>
     <string name="loginEmail">Login Email</string>
@@ -9,16 +9,26 @@
     <string name="loginFeedback">Login Feedback</string>
     <string name="favoriteResults">Favorite Results</string>
     <string name="statusBar">Status Bar</string>
-    <string name="aboutThisApp">\n\nCreator: Xavier Stone\nRelease Date:4/19/2020\n
-    This is an app for those who love mud!\nPlease contact us with any questions.\nAlso rate us.</string>
-    <string name="createAccountStatus">Create Account Status</string>
     <string name="mapResults">Map Results</string>
     <string name="queryPrint">Query Print</string>
     <string name="add">Add</string>
     <string name="delete">Delete</string>
     <string name="search">Search</string>
     <string name="title_activity_maps">Map</string>
-    <string name="facebook_app_id">265318024465984</string>
-    <string name="fb_login_protocol_scheme">fb265318024465984</string>
     <string name="share">Share</string>
+    <string name="searchQueryHint">Search here</string>
+    <string name="favesButtonText">Faves</string>
+    <string name="addButtonText">Add</string>
+    <string name="signButtonText">Sign In</string>
+    <string name="signButtonTextAlt">Sign Out</string>
+    <string name="signOutDialogText">Leaving So Soon?</string>
+    <string name="switchUsers">Switch Users</string>
+    <string name="createAccount">Create Account</string>
+    <string name="cancel">Cancel</string>
+    <string name="helpButtonText">Help</string>
+    <string name="noFilePerms">File permissions disabled, images cannot be loaded</string>
+    <string name="noSiteName">The Site that Can Be Named<br/>is Not the True Site</string>
+    <string name="noPicsFound">"Nobody was wearing clothes so we couldn't post any pictures."</string>
+    <string name="noSiteSkinny">The idiot who posted this was illiterate,<br/>so this is all you get.</string>
+    <string name="picsLoading">Pics Loading, Be Patient</string>
 </resources>

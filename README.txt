@@ -1,11 +1,20 @@
-I did not create a temporary facebook account, but I updated the code and it works perfectly with my account. If for some reason it doesn't work for you, just create a local account with the Create Account button to test the remainder of the features.
+Backyard is an app for locating and reviewing campsites around the world (well, at least the couple sample ones I added in the Upper Connecticut River Valley).
 
-The map includes a current location feature, if you want to make use of this I suggest manually setting your location on the emulator to be somewhere around Lebanon, NH as this is the general area for most of the hard-coded campsites. Map-searching all results is a good way to orient yourself to the area.
+Some of the auxiliary functionality is currently disabled, but the meat of the project is beefy and delicious. The full stack is currently enabled, but I'm not running an actual server, so testing it will require some setup:
 
-The search term field searches for strings containing the provided term. It searches both site name and description. An empty term will return all results. The search menu gives the option of returning a list or results on a map.
+1) install MongoDB and run an instance
+2) using the mongoimport tool, import all collections from the db folder on this repo
+3) download the Backyard Server at github.com/xavierstone/backyard_server and run a Maven build with the goal "spring-boot:run"; this launches the server
+4) download the develop branch of this repo, run in Android Studio
 
-The radius field specifies a range of latitude and longitude. I opted for this because the miles to lat/long conversion varies so much based on latitude.
+Things to Try:
+ - search for "trail"
+ - search for "gorge"
+ - click on the markers that pop up on the map to see more information for a given site
+ - check out the Quechee Gorge site, it has multiple images and thus demonstrates the photo gallery navigation
+ - create a site of your own on the MongoDB back end and verify that it shows up in a search (in-app "add site" functionality is currently disabled)
+ - sign in using the test user with email "test" and password "test" or create an account of your own!
+ - try signing out and switching users as well
 
-To test the Gallery functionality, you will either have to manually upload images to the emulator or make use of Android's interesting Camera emulator. Both of these involve workarounds, but on a real phone it would be very straightforward.
-
--Xavier Stone
+Please be gentle with my baby,
+-Xavier
